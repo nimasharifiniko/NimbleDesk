@@ -4,3 +4,8 @@ pytest
 httpx
 pydantic
 pydantic-settings
+sqlalchemy
+asyncpg
+alembic
+pgvector
+greenlet

@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: nimbledesk_db
+    restart: always
+    environment:
+      POSTGRES_USER: nimble_user
+      POSTGRES_PASSWORD: nimble_pass
+      POSTGRES_DB: nimble_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nimble_user -d nimble_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
