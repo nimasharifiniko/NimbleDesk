@@ -10,3 +10,4 @@ asyncpg
 alembic
 pgvector
 greenlet
+numpy
