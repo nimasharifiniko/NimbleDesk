@@ -1,19 +1,14 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
+from backend.app.api.chat import router as chat_router
 
 app = FastAPI(
-    title="NimbleDesk API",
-    description="Backend service for NimbleDesk platform",
-    version="0.1.0"
+    title="NimbleDesk API Core",
+    description="Multi-Tenant AI Smart Front-Desk Engine",
+    version="0.3.0"
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "NimbleDesk API is running"}
+app.include_router(chat_router)
 
 @app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "service": "nimbledesk-backend"
-    }
-
+async def health_check():
+    return {"status": "ok", "service": "NimbleDesk Core Engine"}
