@@ -1,0 +1,20 @@
+{
+  "en": {
+    "total_test_cases": 6,
+    "avg_precision": 0.0,
+    "avg_recall": 0.0,
+    "exact_match_rate": 1.0
+  },
+  "fa": {
+    "total_test_cases": 5,
+    "avg_precision": 0.0,
+    "avg_recall": 0.0,
+    "exact_match_rate": 1.0
+  },
+  "nl": {
+    "total_test_cases": 5,
+    "avg_precision": 0.0,
+    "avg_recall": 0.0,
+    "exact_match_rate": 1.0
+  }
+}
