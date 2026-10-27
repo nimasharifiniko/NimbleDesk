@@ -1,12 +1,14 @@
-﻿from typing import List
+﻿import io
+from typing import List
 from uuid import UUID
+from pypdf import PdfReader
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.models.knowledge import Document, Chunk
 from backend.app.services.embedding import embedding_service
 
 class IngestionService:
     """
-    Ingests text documents and FAQs, splits them into text chunks,
+    Ingests text documents, FAQs, and PDF files, splits them into text chunks,
     generates vector embeddings, and persists them into PostgreSQL.
     Enforces strict tenant isolation with business_id scoping.
     """
@@ -30,6 +32,18 @@ class IngestionService:
 
         return chunks
 
+    def extract_text_from_pdf(self, pdf_bytes: bytes) -> str:
+        """
+        Extracts raw plain text content from PDF binary data.
+        """
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        pages_text = []
+        for page in reader.pages:
+            extracted = page.extract_text()
+            if extracted:
+                pages_text.append(extracted)
+        return "\n".join(pages_text)
+
     async def ingest_text_document(
         self,
         db: AsyncSession,
@@ -37,7 +51,6 @@ class IngestionService:
         title: str,
         content: str
     ) -> Document:
-        # Create Document record
         doc = Document(
             business_id=business_id,
             title=title
@@ -45,10 +58,7 @@ class IngestionService:
         db.add(doc)
         await db.flush()
 
-        # Chunk text content
         raw_chunks = self.chunk_text(content)
-        
-        # Save chunks with generated embeddings
         for chunk_text in raw_chunks:
             vector = embedding_service.generate_embedding(chunk_text)
             chunk = Chunk(
@@ -61,5 +71,20 @@ class IngestionService:
         await db.commit()
         await db.refresh(doc)
         return doc
+
+    async def ingest_pdf_document(
+        self,
+        db: AsyncSession,
+        business_id: UUID,
+        title: str,
+        pdf_bytes: bytes
+    ) -> Document:
+        extracted_text = self.extract_text_from_pdf(pdf_bytes)
+        return await self.ingest_text_document(
+            db=db,
+            business_id=business_id,
+            title=title,
+            content=extracted_text
+        )
 
 ingestion_service = IngestionService()
