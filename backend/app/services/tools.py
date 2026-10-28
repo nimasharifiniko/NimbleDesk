@@ -1,11 +1,14 @@
 ﻿from typing import Dict, Any, List, Optional
 from uuid import UUID
+from datetime import datetime
 from sqlalchemy import cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from backend.app.models.business_info import BusinessHour, BusinessLink
 from backend.app.models.menu_item import MenuItem
+from backend.app.models.interaction import BookingRequest, ContactRequest
+from backend.app.services.vector_store import vector_store_service
 
 class AIToolsService:
     """
@@ -77,5 +80,70 @@ class AIToolsService:
             }
             for link in links
         ]
+
+    async def get_policy(
+        self,
+        db: AsyncSession,
+        business_id: UUID,
+        query: str
+    ) -> List[Dict[str, Any]]:
+        return await vector_store_service.search_similar_chunks(
+            db=db,
+            business_id=business_id,
+            query=f"policy terms cancellation rules {query}",
+            limit=3
+        )
+
+    async def create_booking_request(
+        self,
+        db: AsyncSession,
+        business_id: UUID,
+        customer_name: str,
+        customer_phone: str,
+        requested_date: datetime,
+        service_id: Optional[UUID] = None,
+        notes: Optional[str] = None
+    ) -> Dict[str, Any]:
+        booking = BookingRequest(
+            business_id=business_id,
+            service_id=service_id,
+            customer_name=customer_name,
+            customer_phone=customer_phone,
+            requested_date=requested_date,
+            notes=notes
+        )
+        db.add(booking)
+        await db.commit()
+        await db.refresh(booking)
+
+        return {
+            "booking_id": str(booking.id),
+            "status": str(booking.status),
+            "message": "Booking request submitted successfully."
+        }
+
+    async def create_contact_request(
+        self,
+        db: AsyncSession,
+        business_id: UUID,
+        customer_name: str,
+        customer_phone: str,
+        message: str
+    ) -> Dict[str, Any]:
+        contact = ContactRequest(
+            business_id=business_id,
+            customer_name=customer_name,
+            customer_phone=customer_phone,
+            message=message
+        )
+        db.add(contact)
+        await db.commit()
+        await db.refresh(contact)
+
+        return {
+            "contact_id": str(contact.id),
+            "status": str(contact.status),
+            "message": "Contact request submitted successfully."
+        }
 
 ai_tools_service = AIToolsService()
