@@ -2,6 +2,7 @@
 from backend.app.api.chat import router as chat_router
 from backend.app.api.auth import router as auth_router
 from backend.app.api.business import router as business_router
+from backend.app.api.business_info import router as business_info_router
 
 app = FastAPI(
     title="NimbleDesk API Core",
@@ -12,6 +13,7 @@ app = FastAPI(
 app.include_router(chat_router)
 app.include_router(auth_router)
 app.include_router(business_router)
+app.include_router(business_info_router)
 
 @app.get("/")
 async def root():
