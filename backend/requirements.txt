@@ -16,3 +16,5 @@ pyjwt[crypto]
 passlib[bcrypt]
 email-validator
 python-multipart
+qrcode
+pillow

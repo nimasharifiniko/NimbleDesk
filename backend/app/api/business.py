@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from uuid import UUID
@@ -9,6 +9,7 @@ from backend.app.core.database import get_db
 from backend.app.models.business import Business
 from backend.app.models.menu_item import MenuItem
 from backend.app.models.service import Service
+from backend.app.services.qr_generator import qr_generator_service
 
 router = APIRouter(prefix="/api/v1", tags=["Business Management"])
 
@@ -62,6 +63,19 @@ async def get_business_by_slug(slug: str, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Business not found.")
 
     return {"id": str(business.id), "name": business.name, "slug": business.slug}
+
+@router.get("/business/{slug}/qr")
+async def get_business_qr_code(slug: str, db: AsyncSession = Depends(get_db)):
+    stmt = select(Business).where(Business.slug == slug)
+    res = await db.execute(stmt)
+    business = res.scalar_one_or_none()
+    if not business:
+        raise HTTPException(status_code=404, detail="Business not found.")
+
+    target_url = f"https://nimbledesk.ai/c/{business.slug}"
+    qr_bytes = qr_generator_service.generate_qr_code(target_url)
+
+    return Response(content=qr_bytes, media_type="image/png")
 
 @router.post("/menu-items", status_code=status.HTTP_201_CREATED)
 async def create_menu_item(request: MenuItemCreateRequest, db: AsyncSession = Depends(get_db)):
