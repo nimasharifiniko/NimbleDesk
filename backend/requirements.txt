@@ -14,3 +14,4 @@ numpy
 pypdf
 pyjwt[crypto]
 passlib[bcrypt]
+email-validator
