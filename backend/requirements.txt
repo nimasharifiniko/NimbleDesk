@@ -12,3 +12,5 @@ pgvector
 greenlet
 numpy
 pypdf
+pyjwt[crypto]
+passlib[bcrypt]
