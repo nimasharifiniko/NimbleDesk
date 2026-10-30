@@ -1,49 +1,48 @@
-# NimbleDesk 🚀
+# ⚡ NimbleDesk - AI-Powered Smart Front-Desk & Customer Engagement Platform
 
-> An AI-powered smart front-desk and customer engagement platform designed for local businesses and service providers.
-
----
-
-## 📌 Overview
-
-**NimbleDesk** helps businesses (restaurants, salons, agencies, etc.) digitize their front-desk customer service. By scanning a QR code, customers can view real-time business profiles and interact with an AI-powered assistant tailored specifically to that business's menu, services, operating hours, and policies.
-
-### Key Highlights
-- **No App Installation Required:** Fully responsive PWA-enabled interface accessible instantly via QR code.
-- **Accurate & Safe AI:** Uses structured database lookups alongside vector search to prevent hallucinations (e.g., prices and operating hours are fetched strictly from DB).
-- **Multi-Tenant Architecture:** Strict data isolation between different business accounts.
-- **Bilingual Support:** Built-in internationalization (English & Persian) with full RTL layout support.
+NimbleDesk is a next-generation, multi-tenant AI support and commerce platform designed for local businesses (cafes, clinics, restaurants, and service providers). It combines a deterministic RAG engine with strict tenant isolation, zero-hallucination pricing, full RTL/Persian layout support, and a beautiful Apple-inspired glassmorphism UI.
 
 ---
 
-## 🛠️ Tech Stack (Target Architecture)
+## ✨ Key Features
 
-- **Backend:** Python, FastAPI, Pydantic, Alembic
-- **Database:** PostgreSQL + pgvector
-- **AI & Retrieval:** Ollama (Qwen 2.5), FastEmbed / HuggingFace Embeddings
-- **Frontend:** Next.js, TypeScript, Tailwind CSS
-- **DevOps & Testing:** Docker Compose, GitHub Actions (CI), pytest, Playwright
-
----
-
-## 🚀 Project Status
-
-This project is currently under active development.
-
-- [x] Initial Repository Architecture Setup
-- [ ] Database Schema & Multi-Tenant Isolation
-- [ ] RAG Pipeline & LLM Tool Integration
-- [ ] Public API & Business Management Dashboard
-- [ ] Customer PWA Interface
+- 🎯 **Zero-Hallucination RAG**: Services, prices, and operating hours are fetched directly from PostgreSQL database records, preventing LLM fabrication.
+- 📀 **Multi-Tenant Security**: Strict `business_id` filtering across all FastAPI endpoints,, vector searches, and DB transactions.
+- 🌰 **Multilingual & Full RTL**: Native support for English (`en`), Persian(`fa`), and Dutch (`nl`) with automatic RTL layout adjustments and Vazirmatn typography.
+- 💢 **PWA Customer Chat Widget**: Fast, mobile-first chat interface with automatic booking modals at `/c/[business_slug]`.
+- 👩 **Industry Onboarding Wizard**: 3-step wizard for Cafes, Clinics, and Services with auto-generated sample menus and FAQs.
+- 📩 **TXT & PDF File Ingestion**: Upload custom business documents and automatically integrate them into the vector store.
+- 🛸﮿ **QR Code Manager & Printable Posters**: Generate business QR codes and print professional announcement posters.
 
 ---
 
-## 📜 License
+## 👏 Tech Stack
 
-Distributed under the MIT License. See `LICENSE` for more information.
+- **Frontend**: Next.js 16.4 (App Router, Turbopack, Cache Components), Tailwind CSS, Lucide React, Next-Intl
+- **Backend**: FastAPI (Asyncio), Pydantic, Alembic, Pytest (51 E2E Integration Tests)
+- **Database & Vector Store**: PostgreSQL 16 with `pgvector`
+- **AI & LLM2 Integration**: OpenAI GPT-4 / GPT-3.5-Turdo, Hybrid Retrieval, Custom Prompt Guard
 
 ---
 
-<p align="center">
-  <b>Powered by NimDesk</b> · Built with ❤️ by <a href="https://github.com/nima-sharifi-niko">Nima Sharifi Niko</a>
-</p>
+## 👉 QuickStart (Local Development)
+
+1. **Clone the repository**:
+   `bash
+   git clone https://github.com/your-username/NimbleDesk.git
+   cd NimbleDesk
+   ``
+
+2. **Start with Docker Compose**:
+   `bash
+   docker compose -f docker-compose.prod.yml up -d --build
+   ``J
+ 3. **Run Backend Tests**:
+   `bash
+   python -m pytest backend/tests/
+   ``J
+---
+
+## 📀 License
+
+MIT License.
