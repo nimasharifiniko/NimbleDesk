@@ -1,0 +1,23 @@
+{
+  "name": "NimbleDesk - AI Smart Front-Desk",
+  "short_name": "NimbleDesk",
+  "description": "AI-Powered Smart Front-Desk & Customer Engagement Platform",
+  "start_url": "/c/demo",
+  "display": "standalone",
+  "background_color": "#080c09",
+  "theme_color": "#39ff14",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
