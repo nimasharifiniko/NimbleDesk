@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 
@@ -20,7 +20,7 @@ export default function BookingModal({
   isOpen,
   onClose,
   serviceName = "General Service",
-  servicePrice = "",
+  servicePrice = "$45",
   onConfirmBooking,
 }: BookingModalProps) {
   const [selectedDate, setSelectedDate] = useState("");
@@ -55,7 +55,6 @@ export default function BookingModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-all animate-fade-in">
       <div className="w-full max-w-[390px] bg-[#0c130e] border border-white/15 rounded-[2.5rem] p-6 shadow-[0_0_50px_rgba(57,255,20,0.15)] text-white relative flex flex-col gap-4">
-        {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
@@ -88,7 +87,6 @@ export default function BookingModal({
 
             <hr className="border-white/10" />
 
-            {/* Date Picker */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-gray-300 font-medium">Select Date</label>
               <input
@@ -100,7 +98,6 @@ export default function BookingModal({
               />
             </div>
 
-            {/* Time Slots */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-gray-300 font-medium">Select Time Slot</label>
               <div className="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
@@ -109,7 +106,11 @@ export default function BookingModal({
                     key={slot}
                     type="button"
                     onClick={() => setSelectedTime(slot)}
-                    className={px-3 py-1.5 text-xs rounded-xl whitespace-nowrap transition border }
+                    className={`px-3 py-1.5 text-xs rounded-xl whitespace-nowrap transition border ${
+                      selectedTime === slot
+                        ? "bg-emerald-500 text-black font-bold border-emerald-400 shadow-[0_0_10px_rgba(57,255,20,0.4)]"
+                        : "bg-white/5 border-white/10 text-gray-300 hover:border-emerald-500/40"
+                    }`}
                   >
                     {slot}
                   </button>
@@ -117,7 +118,6 @@ export default function BookingModal({
               </div>
             </div>
 
-            {/* Customer Information */}
             <div className="flex flex-col gap-2">
               <label className="text-xs text-gray-300 font-medium">Your Contact Information</label>
               <input
@@ -138,7 +138,6 @@ export default function BookingModal({
               />
             </div>
 
-            {/* Submit CTA */}
             <button
               type="submit"
               disabled={!selectedDate || !selectedTime || !name || !phone}

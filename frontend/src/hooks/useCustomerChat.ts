@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useCallback } from "react";
 
@@ -37,7 +37,7 @@ export function useCustomerChat(slug: string) {
     async (text: string) => {
       if (!text.trim() || isTyping) return;
 
-      const userMsgId = user-;
+      const userMsgId = `user-${Date.now()}`;
       const userMsg: ChatMessage = {
         id: userMsgId,
         sender: "user",
@@ -45,7 +45,7 @@ export function useCustomerChat(slug: string) {
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
-      const aiMsgId = i-;
+      const aiMsgId = `ai-${Date.now()}`;
       const aiMsgPlaceholder: ChatMessage = {
         id: aiMsgId,
         sender: "ai",
@@ -60,7 +60,7 @@ export function useCustomerChat(slug: string) {
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
       try {
-        const response = await fetch(${backendUrl}/api/v1/chat/stream/, {
+        const response = await fetch(`${backendUrl}/api/v1/chat/stream/${slug}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text }),
@@ -107,9 +107,8 @@ export function useCustomerChat(slug: string) {
           )
         );
       } catch (err) {
-        // Fallback for UI standalone testing if backend endpoint is offline
         console.warn("Using local response fallback:", err);
-        const fallbackText = Thank you for your inquiry about "". We are ready to serve you! Please choose an option below to proceed.;
+        const fallbackText = `Thank you for your inquiry about "${text}". We are ready to serve you! Please choose an option below to proceed.`;
         setMessages((prev) =>
           prev.map((m) =>
             m.id === aiMsgId

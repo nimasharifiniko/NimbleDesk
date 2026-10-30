@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import { useParams } from "next/navigation";
 import { useCustomerChat } from "@/hooks/useCustomerChat";
 import BookingModal from "@/components/BookingModal";
 
-// Multilingual Dictionary
 const t = {
   en: {
     onlineStatus: "Smart Front-Desk Active",
@@ -37,7 +36,7 @@ const t = {
   },
 };
 
-export default function CustomerChatPage() {
+function ChatComponent() {
   const params = useParams();
   const slug = (params?.slug as string) || "demo";
 
@@ -48,7 +47,6 @@ export default function CustomerChatPage() {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Booking Modal State
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [activeService, setActiveService] = useState({
     name: "General Service",
@@ -100,7 +98,6 @@ export default function CustomerChatPage() {
       className="min-h-screen bg-[#080c09] flex items-center justify-center p-4 select-none font-sans"
     >
       <div className="w-full max-w-[390px] h-[844px] flex flex-col rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(57,255,20,0.08)] bg-black/60 backdrop-blur-xl relative">
-        {/* Header */}
         <header className="flex items-center gap-3 p-5 border-b border-white/10 bg-black/40 backdrop-blur-md">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-bold text-sm shadow-[0_0_12px_rgba(57,255,20,0.4)] capitalize shrink-0">
             {slug.charAt(0)}
@@ -115,7 +112,6 @@ export default function CustomerChatPage() {
             </p>
           </div>
 
-          {/* Language Switcher Toggle */}
           <button
             type="button"
             onClick={toggleLanguage}
@@ -125,7 +121,6 @@ export default function CustomerChatPage() {
           </button>
         </header>
 
-        {/* Chat Messages */}
         <div className="flex-1 p-5 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/10">
           {messages.map((msg) => (
             <div
@@ -149,7 +144,6 @@ export default function CustomerChatPage() {
                   {msg.text || (msg.isStreaming ? dict.aiThinking : "")}
                 </p>
 
-                {/* Service Cards */}
                 {msg.options && (
                   <div className="mt-3 space-y-2">
                     {msg.options.map((opt, idx) => (
@@ -168,7 +162,6 @@ export default function CustomerChatPage() {
                   </div>
                 )}
 
-                {/* Direct Booking CTA */}
                 {msg.hasBookingBtn && (
                   <button
                     type="button"
@@ -186,7 +179,6 @@ export default function CustomerChatPage() {
             </div>
           ))}
 
-          {/* Typing Indicator */}
           {isTyping && (
             <div className="flex items-center gap-1.5 text-xs text-gray-400 glass-bubble-ai px-3 py-2 rounded-xl w-max border border-white/10">
               <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" />
@@ -197,7 +189,6 @@ export default function CustomerChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Action Chips */}
         <div className="px-5 py-2 flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
           <button
             type="button"
@@ -229,7 +220,6 @@ export default function CustomerChatPage() {
           </button>
         </div>
 
-        {/* Input Bar */}
         <footer className="p-4 border-t border-white/10 bg-black/40 backdrop-blur-md">
           <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2.5 focus-within:border-emerald-500/60 transition">
             <button
@@ -260,7 +250,6 @@ export default function CustomerChatPage() {
           </div>
         </footer>
 
-        {/* Booking Modal */}
         <BookingModal
           isOpen={isBookingOpen}
           onClose={() => setIsBookingOpen(false)}
@@ -270,5 +259,13 @@ export default function CustomerChatPage() {
         />
       </div>
     </main>
+  );
+}
+
+export default function CustomerChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#080c09] text-white flex items-center justify-center text-xs">Loading chat...</div>}>
+      <ChatComponent />
+    </Suspense>
   );
 }
