@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useCustomerChat } from "@/hooks/useCustomerChat";
+import BookingModal from "@/components/BookingModal";
 
 export default function CustomerChatPage() {
   const params = useParams();
@@ -11,6 +12,13 @@ export default function CustomerChatPage() {
   const { messages, sendMessage, isTyping } = useCustomerChat(slug);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Booking Modal State
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [activeService, setActiveService] = useState({
+    name: "General Service",
+    price: "",
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -27,9 +35,25 @@ export default function CustomerChatPage() {
     sendMessage(text);
   };
 
+  const handleOpenBooking = (serviceName = "General Service", price = "") => {
+    setActiveService({ name: serviceName, price });
+    setIsBookingOpen(true);
+  };
+
+  const handleConfirmBooking = (bookingData: {
+    serviceName: string;
+    date: string;
+    time: string;
+    customerName: string;
+    customerPhone: string;
+  }) => {
+    const confirmationText = 📅 Appointment Requested:\n• Service: \n• Date: \n• Time: \n• Customer:  ();
+    sendMessage(confirmationText);
+  };
+
   return (
     <main className="min-h-screen bg-[#080c09] flex items-center justify-center p-4 select-none">
-      <div className="w-full max-w-[390px] h-[844px] flex flex-col rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(57,255,20,0.08)] bg-black/60 backdrop-blur-xl">
+      <div className="w-full max-w-[390px] h-[844px] flex flex-col rounded-[2.5rem] overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(57,255,20,0.08)] bg-black/60 backdrop-blur-xl relative">
         {/* Header */}
         <header className="flex items-center gap-3 p-5 border-b border-white/10 bg-black/40 backdrop-blur-md">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-bold text-sm shadow-[0_0_12px_rgba(57,255,20,0.4)] capitalize">
@@ -67,14 +91,14 @@ export default function CustomerChatPage() {
                   {msg.text || (msg.isStreaming ? "Thinking..." : "")}
                 </p>
 
-                {/* Service / Option Cards */}
+                {/* Service Cards */}
                 {msg.options && (
                   <div className="mt-3 space-y-2">
                     {msg.options.map((opt, idx) => (
                       <button
                         key={idx}
                         type="button"
-                        onClick={() => sendMessage(opt.label)}
+                        onClick={() => handleOpenBooking(opt.label, "")}
                         className="w-full text-left flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-emerald-500/40 transition text-xs text-gray-200 group"
                       >
                         <span>{opt.label}</span>
@@ -90,11 +114,11 @@ export default function CustomerChatPage() {
                 {msg.hasBookingBtn && (
                   <button
                     type="button"
-                    onClick={() => sendMessage("I want to book right now")}
+                    onClick={() => handleOpenBooking("General Appointment", "")}
                     className="w-full mt-3 py-2.5 px-4 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(57,255,20,0.4)] hover:brightness-110 active:scale-95 transition"
                   >
-                    <span>Book Appointment</span>
-                    <span>→</span>
+                    <span>Book Now</span>
+                    <span>📅</span>
                   </button>
                 )}
               </div>
@@ -119,24 +143,24 @@ export default function CustomerChatPage() {
         <div className="px-5 py-2 flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
           <button
             type="button"
-            onClick={() => sendMessage("What are your business hours?")}
-            className="px-3 py-1.5 rounded-full glass-bubble-ai border border-white/10 text-gray-300 hover:border-emerald-500/50 hover:text-white whitespace-nowrap transition"
+            onClick={() => handleOpenBooking("Quick Reservation", "")}
+            className="px-3 py-1.5 rounded-full glass-bubble-ai border border-white/10 text-gray-300 hover:border-emerald-500/50 hover:text-white whitespace-nowrap transition flex items-center gap-1.5"
           >
-            🕒 Opening Hours
+            📅 Book Now
           </button>
           <button
             type="button"
-            onClick={() => sendMessage("Can I see your price list?")}
-            className="px-3 py-1.5 rounded-full glass-bubble-ai border border-white/10 text-gray-300 hover:border-emerald-500/50 hover:text-white whitespace-nowrap transition"
+            onClick={() => sendMessage("What are your business hours?")}
+            className="px-3 py-1.5 rounded-full glass-bubble-ai border border-white/10 text-gray-300 hover:border-emerald-500/50 hover:text-white whitespace-nowrap transition flex items-center gap-1.5"
           >
-            📋 Services & Prices
+            🕒 Hours
           </button>
           <button
             type="button"
             onClick={() => sendMessage("I need human support")}
-            className="px-3 py-1.5 rounded-full glass-bubble-ai border border-white/10 text-gray-300 hover:border-emerald-500/50 hover:text-white whitespace-nowrap transition"
+            className="px-3 py-1.5 rounded-full glass-bubble-ai border border-white/10 text-gray-300 hover:border-emerald-500/50 hover:text-white whitespace-nowrap transition flex items-center gap-1.5"
           >
-            👤 Talk to Human
+            🎧 Support
           </button>
         </div>
 
@@ -170,6 +194,15 @@ export default function CustomerChatPage() {
             </button>
           </div>
         </footer>
+
+        {/* Booking Modal Drawer */}
+        <BookingModal
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          serviceName={activeService.name}
+          servicePrice={activeService.price}
+          onConfirmBooking={handleConfirmBooking}
+        />
       </div>
     </main>
   );
