@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardLangProvider, useDashboardLang } from "@/contexts/DashboardLangContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const TRANSLATIONS = {
   en: {
@@ -54,25 +55,43 @@ const TRANSLATIONS = {
   },
 };
 
+function SunIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { lang, setLang, dir } = useDashboardLang();
+  const { theme, toggleTheme } = useTheme();
   const t = TRANSLATIONS[lang];
 
   return (
     <div
       dir={dir}
-      className="min-h-screen bg-neutral-950 text-gray-100 flex font-sans antialiased selection:bg-emerald-500 selection:text-black"
+      className="min-h-screen bg-neutral-950 light:bg-neutral-100 text-gray-100 light:text-slate-900 flex font-sans antialiased selection:bg-emerald-500 selection:text-black transition-colors duration-300"
     >
-      <aside className="w-64 border-e border-white/10 bg-white/5 backdrop-blur-xl flex flex-col justify-between p-5 select-none shrink-0">
+      <aside className="w-64 border-e border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 backdrop-blur-xl flex flex-col justify-between p-5 select-none shrink-0">
         <div className="space-y-6">
           <div className="flex items-center gap-3 px-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-extrabold text-lg shadow-[0_0_15px_rgba(57,255,20,0.35)]">
               ⬡
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white leading-tight">{t.brand}</h2>
-              <p className="text-[10px] text-gray-400">{t.brandSubtitle}</p>
+              <h2 className="text-sm font-bold text-white light:text-slate-900 leading-tight">{t.brand}</h2>
+              <p className="text-[10px] text-gray-400 light:text-slate-500">{t.brandSubtitle}</p>
             </div>
           </div>
 
@@ -85,7 +104,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
                       ? "bg-gradient-to-r from-emerald-500/20 to-green-500/10 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(57,255,20,0.1)] font-semibold"
-                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-gray-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 hover:bg-white/5 light:hover:bg-slate-100"
                     }`}
                 >
                   <span>{item.name}</span>
@@ -100,36 +119,47 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
 
-        <div className="space-y-4 pt-4 border-t border-white/10">
-          {/* دکمه تغییر زبان */}
-          <button
-            type="button"
-            onClick={() => setLang(lang === "en" ? "fa" : "en")}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 text-xs font-semibold text-gray-300 hover:text-emerald-400 transition"
-          >
-            🌐 {t.langToggle}
-          </button>
+        <div className="space-y-4 pt-4 border-t border-white/10 light:border-slate-200">
+          {/* دکمه‌های تغییر زبان و تم */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setLang(lang === "en" ? "fa" : "en")}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-xs font-semibold text-gray-300 light:text-slate-600 hover:text-emerald-400 transition"
+            >
+              🌐 {t.langToggle}
+            </button>
 
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl space-y-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="flex items-center justify-center px-3 py-2 rounded-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-gray-300 light:text-slate-600 hover:text-emerald-400 transition"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-400 text-[11px]">{t.yourPlan}</span>
+              <span className="text-gray-400 light:text-slate-500 text-[11px]">{t.yourPlan}</span>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500 text-black shadow-[0_0_8px_rgba(57,255,20,0.4)]">
                 {t.proPlan}
               </span>
             </div>
-            <div className="flex items-center justify-between text-[11px] text-gray-300">
+            <div className="flex items-center justify-between text-[11px] text-gray-300 light:text-slate-600">
               <span>{t.usage}</span>
               <span className="font-semibold text-emerald-400">78%</span>
             </div>
-            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-white/10 light:bg-slate-200 h-1.5 rounded-full overflow-hidden">
               <div className="bg-gradient-to-r from-emerald-400 to-green-500 h-full w-[78%] rounded-full shadow-[0_0_8px_rgba(57,255,20,0.5)]" />
             </div>
-            <p className="text-[10px] text-gray-500">{t.interactions}</p>
+            <p className="text-[10px] text-gray-500 light:text-slate-400">{t.interactions}</p>
           </div>
 
-          <div className="flex items-center justify-between px-2 text-xs text-gray-400 hover:text-white cursor-pointer transition">
+          <div className="flex items-center justify-between px-2 text-xs text-gray-400 light:text-slate-500 hover:text-white light:hover:text-slate-900 cursor-pointer transition">
             <span className="flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full border border-gray-500 flex items-center justify-center text-[10px]">?</span>
+              <span className="w-4 h-4 rounded-full border border-gray-500 light:border-slate-400 flex items-center justify-center text-[10px]">?</span>
               {t.needHelp}
             </span>
             <span>{dir === "rtl" ? "←" : "→"}</span>
@@ -138,36 +168,36 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-white/10 bg-white/5 backdrop-blur-xl px-8 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-3.5 py-1.5 w-72 focus-within:border-emerald-500/60 transition">
-            <span className="text-gray-400 text-xs">🔍</span>
+        <header className="h-16 border-b border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 backdrop-blur-xl px-8 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-3 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 rounded-xl px-3.5 py-1.5 w-72 focus-within:border-emerald-500/60 transition">
+            <span className="text-gray-400 light:text-slate-400 text-xs">🔍</span>
             <input
               type="text"
               placeholder={t.searchPlaceholder}
-              className="bg-transparent border-none outline-none text-xs text-white placeholder-gray-500 w-full"
+              className="bg-transparent border-none outline-none text-xs text-white light:text-slate-900 placeholder-gray-500 light:placeholder-slate-400 w-full"
             />
-            <span className="text-[10px] bg-white/10 text-gray-400 px-1.5 py-0.5 rounded font-mono">⌘K</span>
+            <span className="text-[10px] bg-white/10 light:bg-slate-100 text-gray-400 light:text-slate-500 px-1.5 py-0.5 rounded font-mono">⌘K</span>
           </div>
 
           <div className="flex items-center gap-4">
             <button
               type="button"
-              className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:border-white/20 transition relative"
+              className="w-9 h-9 rounded-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 flex items-center justify-center text-gray-300 light:text-slate-600 hover:text-white light:hover:text-slate-900 hover:border-white/20 light:hover:border-slate-300 transition relative"
               aria-label="Notifications"
             >
               🔔
               <span className="w-2 h-2 rounded-full bg-emerald-400 absolute top-2 end-2 shadow-[0_0_6px_rgba(57,255,20,0.8)]" />
             </button>
 
-            <div className="flex items-center gap-3 ps-2 border-s border-white/10">
+            <div className="flex items-center gap-3 ps-2 border-s border-white/10 light:border-slate-200">
               <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-700 p-0.5">
-                <div className="w-full h-full rounded-full bg-neutral-950 flex items-center justify-center font-bold text-xs text-emerald-400">
+                <div className="w-full h-full rounded-full bg-neutral-950 light:bg-white flex items-center justify-center font-bold text-xs text-emerald-400">
                   AT
                 </div>
               </div>
               <div className="hidden sm:block">
-                <h4 className="text-xs font-semibold text-white leading-tight">{t.ownerName}</h4>
-                <p className="text-[10px] text-gray-400">{t.ownerRole}</p>
+                <h4 className="text-xs font-semibold text-white light:text-slate-900 leading-tight">{t.ownerName}</h4>
+                <p className="text-[10px] text-gray-400 light:text-slate-500">{t.ownerRole}</p>
               </div>
             </div>
           </div>

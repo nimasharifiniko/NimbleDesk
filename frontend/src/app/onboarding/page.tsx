@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Lang = "fa" | "en";
 
@@ -123,8 +124,26 @@ const TRANSLATIONS = {
   },
 };
 
+function SunIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
 export default function OnboardingWizardPage() {
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useState<Lang>("en");
   const [step, setStep] = useState(1);
   const [selectedIndustryId, setSelectedIndustryId] = useState<string>(INDUSTRIES_BY_LANG.en[0].id);
@@ -170,16 +189,16 @@ export default function OnboardingWizardPage() {
   return (
     <main
       dir={t.dir}
-      className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black"
+      className="min-h-screen bg-neutral-950 light:bg-neutral-100 text-white light:text-slate-900 flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black transition-colors duration-300"
     >
-      <div className="w-full max-w-xl bg-white/5 border border-white/10 rounded-[2.5rem] p-8 shadow-[0_0_60px_rgba(57,255,20,0.08)] backdrop-blur-2xl relative space-y-6">
+      <div className="w-full max-w-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 rounded-[2.5rem] p-8 shadow-[0_0_60px_rgba(57,255,20,0.08)] light:shadow-md backdrop-blur-2xl relative space-y-6">
         {/* Step Indicator */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+        <div className="flex items-center justify-between border-b border-white/10 light:border-slate-200 pb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 text-black font-extrabold flex items-center justify-center text-sm shadow-[0_0_12px_rgba(57,255,20,0.4)]">
               ⬡
             </div>
-            <span className="text-sm font-bold text-white">{t.headerTitle}</span>
+            <span className="text-sm font-bold text-white light:text-slate-900">{t.headerTitle}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -191,9 +210,19 @@ export default function OnboardingWizardPage() {
             <button
               type="button"
               onClick={() => setLang(lang === "en" ? "fa" : "en")}
-              className="text-xs font-semibold text-gray-300 bg-white/5 hover:border-emerald-500/40 border border-white/10 px-3 py-1 rounded-full transition backdrop-blur-xl"
+              className="text-xs font-semibold text-gray-300 light:text-slate-600 bg-white/5 light:bg-white/80 hover:border-emerald-500/40 border border-white/10 light:border-slate-200 px-3 py-1 rounded-full transition backdrop-blur-xl"
             >
               🌐 {lang === "en" ? "FA" : "EN"}
+            </button>
+
+            {/* دکمه تغییر تم */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="flex items-center justify-center text-gray-300 light:text-slate-600 bg-white/5 light:bg-white/80 hover:border-emerald-500/40 border border-white/10 light:border-slate-200 p-1.5 rounded-full transition backdrop-blur-xl"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
           </div>
         </div>
@@ -202,8 +231,8 @@ export default function OnboardingWizardPage() {
         {step === 1 && (
           <div className="space-y-4 animate-fade-in">
             <div>
-              <h2 className="text-lg font-bold text-white">{t.step1Title}</h2>
-              <p className="text-xs text-gray-400 mt-1">{t.step1Subtitle}</p>
+              <h2 className="text-lg font-bold text-white light:text-slate-900">{t.step1Title}</h2>
+              <p className="text-xs text-gray-400 light:text-slate-600 mt-1">{t.step1Subtitle}</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -214,13 +243,13 @@ export default function OnboardingWizardPage() {
                   onClick={() => setSelectedIndustryId(ind.id)}
                   className={`p-4 rounded-2xl border text-start transition flex flex-col justify-between gap-2 backdrop-blur-xl ${selectedIndustry.id === ind.id
                     ? "bg-emerald-500/15 border-emerald-400 shadow-[0_0_20px_rgba(57,255,20,0.2)]"
-                    : "bg-white/5 border-white/10 hover:border-white/20"
+                    : "bg-white/5 light:bg-white/80 border-white/10 light:border-slate-200 hover:border-white/20"
                     }`}
                 >
                   <div className="text-2xl">{ind.icon}</div>
                   <div>
-                    <h3 className="text-xs font-bold text-white">{ind.title}</h3>
-                    <p className="text-[10px] text-gray-400 mt-0.5 line-clamp-2">{ind.desc}</p>
+                    <h3 className="text-xs font-bold text-white light:text-slate-900">{ind.title}</h3>
+                    <p className="text-[10px] text-gray-400 light:text-slate-600 mt-0.5 line-clamp-2">{ind.desc}</p>
                   </div>
                 </button>
               ))}
@@ -232,13 +261,13 @@ export default function OnboardingWizardPage() {
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
             <div>
-              <h2 className="text-lg font-bold text-white">{t.step2Title}</h2>
-              <p className="text-xs text-gray-400 mt-1">{t.step2Subtitle}</p>
+              <h2 className="text-lg font-bold text-white light:text-slate-900">{t.step2Title}</h2>
+              <p className="text-xs text-gray-400 light:text-slate-600 mt-1">{t.step2Subtitle}</p>
             </div>
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="text-gray-300 font-medium">{t.businessNameLabel}</label>
+                <label className="text-gray-300 light:text-slate-700 font-medium">{t.businessNameLabel}</label>
                 <input
                   type="text"
                   required
@@ -249,45 +278,45 @@ export default function OnboardingWizardPage() {
                     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
                     setFormData({ ...formData, businessName: name, slug });
                   }}
-                  className="w-full bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-emerald-500/60 transition"
+                  className="w-full bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white light:text-slate-900 outline-none focus:border-emerald-500/60 transition"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-gray-300 font-medium">{t.slugLabel}</label>
-                <div className="flex items-center bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-gray-400 focus-within:border-emerald-500/60 transition">
-                  <span className="text-[11px] text-gray-500">nimbledesk.com/c/</span>
+                <label className="text-gray-300 light:text-slate-700 font-medium">{t.slugLabel}</label>
+                <div className="flex items-center bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-gray-400 light:text-slate-500 focus-within:border-emerald-500/60 transition">
+                  <span className="text-[11px] text-gray-500 light:text-slate-400">nimbledesk.com/c/</span>
                   <input
                     type="text"
                     required
                     dir="ltr"
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    className="bg-transparent border-none outline-none text-white w-full text-xs"
+                    className="bg-transparent border-none outline-none text-white light:text-slate-900 w-full text-xs"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-gray-300 font-medium">{t.phoneLabel}</label>
+                  <label className="text-gray-300 light:text-slate-700 font-medium">{t.phoneLabel}</label>
                   <input
                     type="tel"
                     dir="ltr"
                     placeholder={t.phonePlaceholder}
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-emerald-500/60 transition"
+                    className="w-full bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white light:text-slate-900 outline-none focus:border-emerald-500/60 transition"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-gray-300 font-medium">{t.addressLabel}</label>
+                  <label className="text-gray-300 light:text-slate-700 font-medium">{t.addressLabel}</label>
                   <input
                     type="text"
                     placeholder={t.addressPlaceholder}
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-emerald-500/60 transition"
+                    className="w-full bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white light:text-slate-900 outline-none focus:border-emerald-500/60 transition"
                   />
                 </div>
               </div>
@@ -299,8 +328,8 @@ export default function OnboardingWizardPage() {
         {step === 3 && (
           <div className="space-y-4 animate-fade-in">
             <div>
-              <h2 className="text-lg font-bold text-white">{t.step3Title}</h2>
-              <p className="text-xs text-gray-400 mt-1">
+              <h2 className="text-lg font-bold text-white light:text-slate-900">{t.step3Title}</h2>
+              <p className="text-xs text-gray-400 light:text-slate-600 mt-1">
                 {lang === "fa" ? (
                   <>دستیار هوشمند شما با خدمات پیش‌فرض برای <span className="text-emerald-400 font-semibold">{selectedIndustry.title}</span> آماده است.</>
                 ) : (
@@ -309,13 +338,13 @@ export default function OnboardingWizardPage() {
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl space-y-3">
+            <div className="p-4 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl space-y-3">
               <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
                 {t.preloadedServices}
               </h4>
               <div className="space-y-2">
                 {selectedIndustry.defaultServices.map((svc, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-950/30 backdrop-blur-sm border border-white/5 text-xs text-gray-200">
+                  <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-950/30 light:bg-neutral-100 backdrop-blur-sm border border-white/5 light:border-slate-200 text-xs text-gray-200 light:text-slate-700">
                     <span>{svc}</span>
                     <span className="text-emerald-400 text-xs">{t.active}</span>
                   </div>
@@ -326,12 +355,12 @@ export default function OnboardingWizardPage() {
         )}
 
         {/* Footer Navigation */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/10">
+        <div className="flex items-center justify-between pt-4 border-t border-white/10 light:border-slate-200">
           {step > 1 ? (
             <button
               type="button"
               onClick={() => setStep((prev) => prev - 1)}
-              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-xl text-xs text-gray-300 transition"
+              className="px-4 py-2 rounded-xl bg-white/5 light:bg-white/80 hover:bg-white/10 border border-white/10 light:border-slate-200 backdrop-blur-xl text-xs text-gray-300 light:text-slate-600 transition"
             >
               {t.back}
             </button>

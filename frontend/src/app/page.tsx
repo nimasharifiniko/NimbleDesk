@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type Lang = "fa" | "en";
 
@@ -84,14 +85,38 @@ const TRANSLATIONS = {
   },
 };
 
+function SunIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>("en");
+  const { theme, toggleTheme } = useTheme();
+  const [year, setYear] = useState<number>(2025);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   const t = TRANSLATIONS[lang];
 
   return (
     <main
       dir={t.dir}
-      className="relative min-h-screen overflow-hidden bg-neutral-950 text-white selection:bg-emerald-500 selection:text-black"
+      className="relative min-h-screen overflow-hidden bg-neutral-950 light:bg-neutral-100 text-white light:text-slate-900 selection:bg-emerald-500 selection:text-black transition-colors duration-300"
     >
       {/* Ambient Glow Background */}
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]" />
@@ -99,27 +124,36 @@ export default function LandingPage() {
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/10 blur-[100px]" />
 
       {/* Header */}
-      <header className="relative z-10 sticky top-0 border-b border-white/10 bg-neutral-950/70 backdrop-blur-xl">
+      <header className="relative z-10 sticky top-0 border-b border-white/10 light:border-slate-200 bg-neutral-950/70 light:bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-extrabold text-lg shadow-[0_0_15px_rgba(57,255,20,0.35)]">
               ⬡
             </div>
-            <span className="text-sm sm:text-base font-bold text-white">{t.brand}</span>
+            <span className="text-sm sm:text-base font-bold text-white light:text-slate-900">{t.brand}</span>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <button
               type="button"
               onClick={() => setLang(lang === "en" ? "fa" : "en")}
-              className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 backdrop-blur-xl transition hover:border-emerald-500/40"
+              className="flex items-center gap-1.5 rounded-full border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 px-3 py-1.5 text-xs text-gray-200 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40"
             >
               🌐 {lang === "en" ? "FA" : "EN"}
             </button>
 
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              className="flex items-center justify-center rounded-full border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 p-2 text-gray-200 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+
             <Link
               href="/dashboard"
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold text-gray-200 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400"
+              className="rounded-full border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 px-4 py-1.5 text-xs font-semibold text-gray-200 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400"
             >
               {t.loginBtn}
             </Link>
@@ -129,14 +163,14 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 mx-auto max-w-4xl px-5 pt-16 pb-14 text-center sm:px-8 sm:pt-24 sm:pb-20">
-        <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+        <h1 className="text-3xl font-extrabold leading-tight text-white light:text-slate-900 sm:text-5xl lg:text-6xl">
           {t.heroTitleLine1}{" "}
           <span className="bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
             {t.heroTitleHighlight}
           </span>
         </h1>
 
-        <p className="mx-auto mt-5 max-w-2xl text-sm text-gray-400 sm:text-base">
+        <p className="mx-auto mt-5 max-w-2xl text-sm text-gray-400 light:text-slate-600 sm:text-base">
           {t.heroSubtitle}
         </p>
 
@@ -152,7 +186,7 @@ export default function LandingPage() {
             href="/c/sample-cafe"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-semibold text-gray-200 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400 text-center"
+            className="w-full sm:w-auto rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 px-7 py-3.5 text-sm font-semibold text-gray-200 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400 text-center"
           >
             {t.ctaSecondary}
           </a>
@@ -162,21 +196,21 @@ export default function LandingPage() {
       {/* Features Section */}
       <section className="relative z-10 mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24">
         <div className="text-center mb-10">
-          <h2 className="text-xl font-bold text-white sm:text-3xl">{t.featuresTitle}</h2>
-          <p className="mt-2 text-xs text-gray-400 sm:text-sm">{t.featuresSubtitle}</p>
+          <h2 className="text-xl font-bold text-white light:text-slate-900 sm:text-3xl">{t.featuresTitle}</h2>
+          <p className="mt-2 text-xs text-gray-400 light:text-slate-600 sm:text-sm">{t.featuresSubtitle}</p>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {t.features.map((f, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
+              className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
             >
               <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
                 {f.icon}
               </div>
-              <h3 className="text-sm font-bold text-white">{f.title}</h3>
-              <p className="mt-1.5 text-xs text-gray-400 leading-relaxed">{f.desc}</p>
+              <h3 className="text-sm font-bold text-white light:text-slate-900">{f.title}</h3>
+              <p className="mt-1.5 text-xs text-gray-400 light:text-slate-600 leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -184,9 +218,9 @@ export default function LandingPage() {
 
       {/* Final CTA Band */}
       <section className="relative z-10 mx-auto max-w-4xl px-5 pb-20 sm:px-8 sm:pb-28">
-        <div className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 text-center backdrop-blur-2xl shadow-[0_0_60px_rgba(57,255,20,0.08)] sm:p-12">
-          <h2 className="text-lg font-bold text-white sm:text-2xl">{t.finalCtaTitle}</h2>
-          <p className="mt-2 text-xs text-gray-400 sm:text-sm">{t.finalCtaSubtitle}</p>
+        <div className="rounded-[2.5rem] border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-8 text-center backdrop-blur-2xl shadow-[0_0_60px_rgba(57,255,20,0.08)] sm:p-12">
+          <h2 className="text-lg font-bold text-white light:text-slate-900 sm:text-2xl">{t.finalCtaTitle}</h2>
+          <p className="mt-2 text-xs text-gray-400 light:text-slate-600 sm:text-sm">{t.finalCtaSubtitle}</p>
 
           <Link
             href="/signup"
@@ -198,9 +232,9 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-6 text-center">
-        <p className="text-[11px] text-gray-500">
-          © {new Date().getFullYear()} {t.brand} — {t.footerRights}
+      <footer className="relative z-10 border-t border-white/10 light:border-slate-200 py-6 text-center">
+        <p className="text-[11px] text-gray-500 light:text-slate-500">
+          © {year} {t.brand} — {t.footerRights}
         </p>
       </footer>
     </main>

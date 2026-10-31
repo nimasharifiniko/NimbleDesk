@@ -124,23 +124,23 @@ export default function BusinessDashboardOverview() {
       {/* Top Banner & Date Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-xl font-bold text-white light:text-slate-900 flex items-center gap-2">
             {t.welcome}
           </h1>
-          <p className="text-xs text-gray-400 mt-0.5">{t.subtitle}</p>
+          <p className="text-xs text-gray-400 light:text-slate-600 mt-0.5">{t.subtitle}</p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-3 py-1.5 text-xs text-gray-300">
+          <div className="flex items-center gap-2 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3 py-1.5 text-xs text-gray-300 light:text-slate-600">
             <span>📅 {dateRangeText || "…"}</span>
-            <span className="text-gray-500">▼</span>
+            <span className="text-gray-500 light:text-slate-400">▼</span>
           </div>
 
           {/* دکمه تغییر زبان */}
           <button
             type="button"
             onClick={() => setLang(lang === "en" ? "fa" : "en")}
-            className="flex items-center gap-1.5 bg-white/5 border border-white/10 backdrop-blur-xl hover:border-emerald-500/40 rounded-xl px-3 py-1.5 text-xs text-gray-300 transition"
+            className="flex items-center gap-1.5 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl hover:border-emerald-500/40 rounded-xl px-3 py-1.5 text-xs text-gray-300 light:text-slate-600 transition"
           >
             🌐 {lang === "en" ? "FA" : "EN"}
           </button>
@@ -152,16 +152,16 @@ export default function BusinessDashboardOverview() {
         {t.metrics.map((m, idx) => (
           <div
             key={idx}
-            className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl hover:border-emerald-500/30 transition flex flex-col justify-between"
+            className="p-4 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl hover:border-emerald-500/30 transition flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400 font-medium">{m.title}</span>
-              <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-sm">
+              <span className="text-xs text-gray-400 light:text-slate-600 font-medium">{m.title}</span>
+              <div className="w-8 h-8 rounded-xl bg-white/5 light:bg-slate-100 flex items-center justify-center text-sm">
                 {m.icon}
               </div>
             </div>
             <div className="mt-3">
-              <h3 className="text-2xl font-bold text-white">{m.value}</h3>
+              <h3 className="text-2xl font-bold text-white light:text-slate-900">{m.value}</h3>
               <p className="text-[11px] text-emerald-400 font-medium mt-1">
                 {m.change}
               </p>
@@ -173,16 +173,16 @@ export default function BusinessDashboardOverview() {
       {/* Main Grid: QR Code Generator & Upload Documents & Business Hours */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* QR Code Generator Widget */}
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col justify-between space-y-4">
+        <div className="p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white">{t.qrTitle}</h3>
-              <p className="text-[11px] text-gray-400">{t.qrSubtitle}</p>
+              <h3 className="text-sm font-semibold text-white light:text-slate-900">{t.qrTitle}</h3>
+              <p className="text-[11px] text-gray-400 light:text-slate-500">{t.qrSubtitle}</p>
             </div>
-            <span className="text-gray-500 hover:text-white cursor-pointer">•••</span>
+            <span className="text-gray-500 light:text-slate-400 hover:text-white light:hover:text-slate-900 cursor-pointer">•••</span>
           </div>
 
-          <div className="flex flex-col items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm rounded-xl border border-slate-800/60 relative">
+          <div className="flex flex-col items-center justify-center p-4 bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm rounded-xl border border-white/10 light:border-slate-200 relative">
             <div className="w-40 h-40 bg-white p-3 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.2)]">
               {/* QR Placeholder Icon */}
               <div className="w-full h-full border-4 border-black rounded-lg flex items-center justify-center bg-black text-emerald-400 font-bold text-xs text-center p-2">
@@ -192,8 +192,8 @@ export default function BusinessDashboardOverview() {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between bg-slate-950/40 backdrop-blur-sm border border-slate-800/60 rounded-xl px-3 py-2 text-xs text-gray-300">
-              <span className="truncate text-[11px] text-gray-400">https://aifrontdesk.com/your-business</span>
+            <div className="flex items-center justify-between bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-300 light:text-slate-600">
+              <span className="truncate text-[11px] text-gray-400 light:text-slate-500">https://aifrontdesk.com/your-business</span>
               <button type="button" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold">{t.copyBtn}</button>
             </div>
             <button
@@ -206,7 +206,7 @@ export default function BusinessDashboardOverview() {
               href="/c/sample-cafe"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 border border-white/10 hover:border-emerald-500/40 text-gray-300 hover:text-emerald-400 font-semibold text-xs rounded-xl backdrop-blur-xl transition"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-gray-300 light:text-slate-600 hover:text-emerald-400 font-semibold text-xs rounded-xl backdrop-blur-xl transition"
             >
               {t.previewChat}
             </a>
@@ -214,25 +214,25 @@ export default function BusinessDashboardOverview() {
         </div>
 
         {/* Upload Documents Widget */}
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col justify-between space-y-4">
+        <div className="p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white">{t.uploadTitle}</h3>
-              <p className="text-[11px] text-gray-400">{t.uploadSubtitle}</p>
+              <h3 className="text-sm font-semibold text-white light:text-slate-900">{t.uploadTitle}</h3>
+              <p className="text-[11px] text-gray-400 light:text-slate-500">{t.uploadSubtitle}</p>
             </div>
-            <span className="text-gray-500 hover:text-white cursor-pointer">•••</span>
+            <span className="text-gray-500 light:text-slate-400 hover:text-white light:hover:text-slate-900 cursor-pointer">•••</span>
           </div>
 
           {/* Drag & Drop Area */}
-          <div className="border-2 border-dashed border-slate-700 hover:border-emerald-500/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-2 bg-slate-950/30 backdrop-blur-sm cursor-pointer transition">
+          <div className="border-2 border-dashed border-white/20 light:border-slate-300 hover:border-emerald-500/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-2 bg-neutral-950/30 light:bg-slate-50 backdrop-blur-sm cursor-pointer transition">
             <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg">
               ☁️
             </div>
-            <p className="text-xs font-semibold text-white">
+            <p className="text-xs font-semibold text-white light:text-slate-900">
               {t.dragDrop}
             </p>
-            <p className="text-[10px] text-gray-500">{t.orBrowse}</p>
-            <span className="text-[9px] text-gray-500">{t.supportText}</span>
+            <p className="text-[10px] text-gray-500 light:text-slate-500">{t.orBrowse}</p>
+            <span className="text-[9px] text-gray-500 light:text-slate-400">{t.supportText}</span>
           </div>
 
           {/* File Upload List */}
@@ -240,13 +240,13 @@ export default function BusinessDashboardOverview() {
             {t.recentDocs.map((doc, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/30 backdrop-blur-sm border border-white/5 text-xs"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-950/30 light:bg-slate-50 backdrop-blur-sm border border-white/5 light:border-slate-200 text-xs"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="text-red-400 font-bold text-sm">📄</span>
                   <div className="truncate">
-                    <p className="text-xs font-medium text-gray-200 truncate">{doc.name}</p>
-                    <p className="text-[10px] text-gray-500">{doc.size} • {doc.uploaded}</p>
+                    <p className="text-xs font-medium text-gray-200 light:text-slate-700 truncate">{doc.name}</p>
+                    <p className="text-[10px] text-gray-500 light:text-slate-400">{doc.size} • {doc.uploaded}</p>
                   </div>
                 </div>
                 <span className="text-emerald-400 text-xs">✓</span>
@@ -256,31 +256,31 @@ export default function BusinessDashboardOverview() {
         </div>
 
         {/* Business Hours Widget */}
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl flex flex-col justify-between space-y-4">
+        <div className="p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white">{t.hoursTitle}</h3>
-              <p className="text-[11px] text-gray-400">{t.hoursSubtitle}</p>
+              <h3 className="text-sm font-semibold text-white light:text-slate-900">{t.hoursTitle}</h3>
+              <p className="text-[11px] text-gray-400 light:text-slate-500">{t.hoursSubtitle}</p>
             </div>
-            <span className="text-gray-500 hover:text-white cursor-pointer">•••</span>
+            <span className="text-gray-500 light:text-slate-400 hover:text-white light:hover:text-slate-900 cursor-pointer">•••</span>
           </div>
 
           <div className="space-y-2.5 text-xs">
             {weekDaysOpen.map((day) => (
-              <div key={day} className="flex items-center justify-between text-gray-300">
+              <div key={day} className="flex items-center justify-between text-gray-300 light:text-slate-600">
                 <span className="w-20 font-medium text-[11px]">{t.days[day]}</span>
                 <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow-[0_0_6px_rgba(57,255,20,0.6)]" />
-                  <span className="text-[11px] text-gray-400">{t.openHours}</span>
+                  <span className="text-[11px] text-gray-400 light:text-slate-500">{t.openHours}</span>
                 </div>
               </div>
             ))}
             {weekDaysClosed.map((day) => (
-              <div key={day} className="flex items-center justify-between text-gray-500">
+              <div key={day} className="flex items-center justify-between text-gray-500 light:text-slate-400">
                 <span className="w-20 font-medium text-[11px]">{t.days[day]}</span>
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-gray-600 inline-block" />
-                  <span className="text-[11px] text-gray-500">{t.closed}</span>
+                  <span className="w-3 h-3 rounded-full bg-gray-600 light:bg-slate-300 inline-block" />
+                  <span className="text-[11px] text-gray-500 light:text-slate-400">{t.closed}</span>
                 </div>
               </div>
             ))}
