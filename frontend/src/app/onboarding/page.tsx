@@ -148,7 +148,22 @@ export default function OnboardingWizardPage() {
     if (step < 3) {
       setStep((prev) => prev + 1);
     } else {
-      router.push("/dashboard");
+      // ذخیره اطلاعات کسب‌وکار دمو در localStorage (برای تشخیص "آنبوردینگ تکمیل‌شده" توسط داشبورد)
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "nimble_business",
+          JSON.stringify({
+            industry: selectedIndustry.id,
+            businessName: formData.businessName,
+            slug: formData.slug,
+            phone: formData.phone,
+            address: formData.address,
+          })
+        );
+      }
+      // استفاده از ناوبری کامل مرورگر به‌جای router.push تا هر چک لاگین/میدلور
+      // با یک full page load تازه ارزیابی شود و حالت قدیمی استیت باقی نماند
+      window.location.href = "/dashboard";
     }
   };
 

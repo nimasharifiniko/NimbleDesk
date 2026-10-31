@@ -93,6 +93,13 @@ export default function SignupPage() {
 
         setErrors(newErrors);
         if (Object.keys(newErrors).length === 0) {
+            // ذخیره توکن/کاربر دمو در localStorage تا داشبورد کاربر را "لاگین‌شده" تشخیص دهد
+            if (typeof window !== 'undefined') {
+                localStorage.setItem(
+                    'nimble_user',
+                    JSON.stringify({ name: formData.name, email: formData.email })
+                );
+            }
             router.push('/onboarding');
         }
     };
