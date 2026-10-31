@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardLangProvider, useDashboardLang } from "@/contexts/DashboardLangContext";
@@ -74,27 +74,75 @@ function MoonIcon() {
   );
 }
 
+/* آیکون‌های جدید — بدون وابستگی به کتابخانه خارجی */
+function MenuIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { lang, setLang, dir } = useDashboardLang();
   const { theme, toggleTheme } = useTheme();
   const t = TRANSLATIONS[lang];
 
+  // کنترل باز/بسته بودن سایدبار در حالت موبایل (Drawer)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // جهت صحیح انیمیشن ورود سایدبار بر اساس RTL/LTR
+  const closedTransform = dir === "rtl" ? "translate-x-full" : "-translate-x-full";
+
   return (
     <div
       dir={dir}
       className="min-h-screen bg-neutral-950 light:bg-neutral-100 text-gray-100 light:text-slate-900 flex font-sans antialiased selection:bg-emerald-500 selection:text-black transition-colors duration-300"
     >
-      <aside className="w-64 border-e border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 backdrop-blur-xl flex flex-col justify-between p-5 select-none shrink-0">
+      {/* Overlay تیره پشت سایدبار موبایل */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+        />
+      )}
+
+      <aside
+        className={`fixed md:static inset-y-0 start-0 z-50 w-64 h-full border-e border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 backdrop-blur-xl flex flex-col justify-between p-5 select-none shrink-0 overflow-y-auto transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : closedTransform
+          } md:translate-x-0`}
+      >
         <div className="space-y-6">
           <div className="flex items-center gap-3 px-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-extrabold text-lg shadow-[0_0_15px_rgba(57,255,20,0.35)]">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-extrabold text-lg shadow-[0_0_15px_rgba(57,255,20,0.35)] shrink-0">
               ⬡
             </div>
-            <div>
-              <h2 className="text-sm font-bold text-white light:text-slate-900 leading-tight">{t.brand}</h2>
-              <p className="text-[10px] text-gray-400 light:text-slate-500">{t.brandSubtitle}</p>
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold text-white light:text-slate-900 leading-tight truncate">{t.brand}</h2>
+              <p className="text-[10px] text-gray-400 light:text-slate-500 truncate">{t.brandSubtitle}</p>
             </div>
+
+            {/* دکمه بستن سایدبار — فقط موبایل */}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close menu"
+              className="md:hidden ms-auto flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 light:text-slate-500 hover:text-white light:hover:text-slate-900 hover:bg-white/10 light:hover:bg-slate-100 transition shrink-0"
+            >
+              <CloseIcon />
+            </button>
           </div>
 
           <nav className="space-y-1">
@@ -104,6 +152,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
                       ? "bg-gradient-to-r from-emerald-500/20 to-green-500/10 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(57,255,20,0.1)] font-semibold"
                       : "text-gray-400 light:text-slate-600 hover:text-white light:hover:text-slate-900 hover:bg-white/5 light:hover:bg-slate-100"
@@ -177,18 +226,30 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 backdrop-blur-xl px-8 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center gap-3 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 rounded-xl px-3.5 py-1.5 w-72 focus-within:border-emerald-500/60 transition">
-            <span className="text-gray-400 light:text-slate-400 text-xs">🔍</span>
-            <input
-              type="text"
-              placeholder={t.searchPlaceholder}
-              className="bg-transparent border-none outline-none text-xs text-white light:text-slate-900 placeholder-gray-500 light:placeholder-slate-400 w-full"
-            />
-            <span className="text-[10px] bg-white/10 light:bg-slate-100 text-gray-400 light:text-slate-500 px-1.5 py-0.5 rounded font-mono">⌘K</span>
+        <header className="h-16 border-b border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 backdrop-blur-xl px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {/* دکمه همبرگر — فقط موبایل */}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 text-gray-300 light:text-slate-600 hover:border-emerald-500/40 transition shrink-0"
+            >
+              <MenuIcon />
+            </button>
+
+            <div className="hidden sm:flex items-center gap-3 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 rounded-xl px-3.5 py-1.5 w-full max-w-xs md:w-72 focus-within:border-emerald-500/60 transition">
+              <span className="text-gray-400 light:text-slate-400 text-xs">🔍</span>
+              <input
+                type="text"
+                placeholder={t.searchPlaceholder}
+                className="bg-transparent border-none outline-none text-xs text-white light:text-slate-900 placeholder-gray-500 light:placeholder-slate-400 w-full min-w-0"
+              />
+              <span className="hidden md:inline-block text-[10px] bg-white/10 light:bg-slate-100 text-gray-400 light:text-slate-500 px-1.5 py-0.5 rounded font-mono shrink-0">⌘K</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 shrink-0">
             <button
               type="button"
               className="w-9 h-9 rounded-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 flex items-center justify-center text-gray-300 light:text-slate-600 hover:text-white light:hover:text-slate-900 hover:border-white/20 light:hover:border-slate-300 transition relative"
@@ -199,7 +260,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </button>
 
             <div className="flex items-center gap-3 ps-2 border-s border-white/10 light:border-slate-200">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-700 p-0.5">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-700 p-0.5 shrink-0">
                 <div className="w-full h-full rounded-full bg-neutral-950 light:bg-white flex items-center justify-center font-bold text-xs text-emerald-400">
                   AT
                 </div>
@@ -212,7 +273,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

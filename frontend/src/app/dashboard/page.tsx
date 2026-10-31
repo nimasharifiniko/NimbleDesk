@@ -127,17 +127,17 @@ export default function BusinessDashboardOverview() {
   const weekDaysClosed: (keyof typeof t.days)[] = ["Saturday", "Sunday"];
 
   return (
-    <div dir={t.dir} className="space-y-6">
+    <div dir={t.dir} className="space-y-5 md:space-y-6">
       {/* Top Banner & Date Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white light:text-slate-900 flex items-center gap-2">
+          <h1 className="text-lg sm:text-xl font-bold text-white light:text-slate-900 flex items-center gap-2">
             {t.welcome}
           </h1>
           <p className="text-xs text-gray-400 light:text-slate-600 mt-0.5">{t.subtitle}</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-2 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3 py-1.5 text-xs text-gray-300 light:text-slate-600">
             <span>📅 {dateRangeText || "…"}</span>
             <span className="text-gray-500 light:text-slate-400">▼</span>
@@ -155,7 +155,7 @@ export default function BusinessDashboardOverview() {
       </div>
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {t.metrics.map((m, idx) => (
           <div
             key={idx}
@@ -163,7 +163,7 @@ export default function BusinessDashboardOverview() {
           >
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-400 light:text-slate-600 font-medium">{m.title}</span>
-              <div className="w-8 h-8 rounded-xl bg-white/5 light:bg-slate-100 flex items-center justify-center text-sm">
+              <div className="w-8 h-8 rounded-xl bg-white/5 light:bg-slate-100 flex items-center justify-center text-sm shrink-0">
                 {m.icon}
               </div>
             </div>
@@ -178,9 +178,9 @@ export default function BusinessDashboardOverview() {
       </div>
 
       {/* Main Grid: QR Code Generator & Upload Documents & Business Hours */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* QR Code Generator Widget */}
-        <div className="p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-white light:text-slate-900">{t.qrTitle}</h3>
@@ -189,9 +189,9 @@ export default function BusinessDashboardOverview() {
             <span className="text-gray-500 light:text-slate-400 hover:text-white light:hover:text-slate-900 cursor-pointer">•••</span>
           </div>
 
-          <div className="flex flex-col items-center justify-center p-4 bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm rounded-xl border border-white/10 light:border-slate-200 relative">
-            {/* فریم شیشه‌ای + گلو سبز نئونی دور QR واقعی */}
-            <div className="w-40 h-40 rounded-2xl overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.25)] border border-emerald-500/20 bg-neutral-950">
+          <div className="w-full flex flex-col items-center justify-center p-4 bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm rounded-xl border border-white/10 light:border-slate-200 relative">
+            {/* فریم شیشه‌ای + گلو سبز نئونی دور QR واقعی — وسط‌چین و کاملاً قابل اسکن در موبایل */}
+            <div className="w-40 h-40 sm:w-44 sm:h-44 rounded-2xl overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.25)] border border-emerald-500/20 bg-neutral-950 mx-auto">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={QR_IMAGE_URL}
@@ -206,7 +206,7 @@ export default function BusinessDashboardOverview() {
           <div className="space-y-2">
             <div className="flex items-center justify-between bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-300 light:text-slate-600">
               <span className="truncate text-[11px] text-gray-400 light:text-slate-500">{QR_TARGET_URL}</span>
-              <button type="button" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold">{t.copyBtn}</button>
+              <button type="button" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold shrink-0 ms-2">{t.copyBtn}</button>
             </div>
             <a
               href={QR_IMAGE_URL}
@@ -227,7 +227,7 @@ export default function BusinessDashboardOverview() {
         </div>
 
         {/* Upload Documents Widget */}
-        <div className="p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-white light:text-slate-900">{t.uploadTitle}</h3>
@@ -256,20 +256,20 @@ export default function BusinessDashboardOverview() {
                 className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-950/30 light:bg-slate-50 backdrop-blur-sm border border-white/5 light:border-slate-200 text-xs"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-red-400 font-bold text-sm">📄</span>
+                  <span className="text-red-400 font-bold text-sm shrink-0">📄</span>
                   <div className="truncate">
                     <p className="text-xs font-medium text-gray-200 light:text-slate-700 truncate">{doc.name}</p>
                     <p className="text-[10px] text-gray-500 light:text-slate-400">{doc.size} • {doc.uploaded}</p>
                   </div>
                 </div>
-                <span className="text-emerald-400 text-xs">✓</span>
+                <span className="text-emerald-400 text-xs shrink-0 ms-2">✓</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Business Hours Widget */}
-        <div className="p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 light:shadow-md backdrop-blur-xl flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-white light:text-slate-900">{t.hoursTitle}</h3>
