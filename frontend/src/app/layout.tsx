@@ -7,14 +7,16 @@ export const metadata: Metadata = {
   description: "AI-powered 24/7 Smart Front Desk & Customer Engagement Platform by Nima Sharifi Niko",
   authors: [{ name: "Nima Sharifi Niko" }],
   manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "NimbleDesk",
-  },
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "NimbleDesk" },
   icons: {
-    icon: "/icons/icon-192.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 
@@ -25,11 +27,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body className="antialiased bg-neutral-950 light:bg-neutral-100 text-gray-100 light:text-slate-900 font-sans transition-colors duration-300">
