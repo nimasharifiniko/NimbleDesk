@@ -22,6 +22,7 @@ const translations = {
         terms: 'با ادامه، شما قوانین و مقررات ما را می‌پذیرید.',
         langToggle: 'English',
         brand: 'دستیار هوشمند',
+        footerCopyright: '© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو',
     },
     en: {
         dir: 'ltr' as const,
@@ -38,6 +39,7 @@ const translations = {
         terms: 'By continuing, you agree to our Terms & Conditions.',
         langToggle: 'فارسی',
         brand: 'AI Front Desk',
+        footerCopyright: '© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko',
     },
 };
 
@@ -120,7 +122,7 @@ export default function SignupPage() {
     };
 
     return (
-        <div dir={t.dir} className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 light:bg-neutral-100 px-4 py-10 transition-colors duration-300">
+        <div dir={t.dir} className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-neutral-950 light:bg-neutral-100 px-4 py-10 transition-colors duration-300">
             {/* نورهای محو سبز در پس‌زمینه (Ambient Glow) */}
             <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-green-500/20 blur-[120px]" />
             <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-[120px]" />
@@ -219,6 +221,11 @@ export default function SignupPage() {
                         </a>
                     </p>
                 </div>
+
+                {/* کپی‌رایت برندینگ */}
+                <p className="mt-6 text-center text-[11px] text-gray-500 light:text-slate-500">
+                    {t.footerCopyright}
+                </p>
             </div>
         </div>
     );

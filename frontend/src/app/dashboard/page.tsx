@@ -88,6 +88,13 @@ const TRANSLATIONS = {
   },
 };
 
+// آدرس نمونه چت مشتری که QR به آن اشاره می‌کند
+const QR_TARGET_URL = "https://nimble-desk.vercel.app/c/sample-cafe";
+// QR Code واقعی از QRServer API — رنگ‌ها هماهنگ با پالت پروژه (emerald روی پس‌زمینه رسمی #080c09)
+const QR_IMAGE_URL = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+  QR_TARGET_URL
+)}&color=10b981&bgcolor=080c09`;
+
 export default function BusinessDashboardOverview() {
   const { lang, setLang } = useDashboardLang();
   const t = TRANSLATIONS[lang];
@@ -183,25 +190,31 @@ export default function BusinessDashboardOverview() {
           </div>
 
           <div className="flex flex-col items-center justify-center p-4 bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm rounded-xl border border-white/10 light:border-slate-200 relative">
-            <div className="w-40 h-40 bg-white p-3 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.2)]">
-              {/* QR Placeholder Icon */}
-              <div className="w-full h-full border-4 border-black rounded-lg flex items-center justify-center bg-black text-emerald-400 font-bold text-xs text-center p-2">
-                [ SCAN ME ]
-              </div>
+            {/* فریم شیشه‌ای + گلو سبز نئونی دور QR واقعی */}
+            <div className="w-40 h-40 rounded-2xl overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.25)] border border-emerald-500/20 bg-neutral-950">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={QR_IMAGE_URL}
+                alt="QR Code - NimbleDesk AI Front Desk"
+                width={160}
+                height={160}
+                className="w-[92%] h-[92%] object-contain rounded-lg"
+              />
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-300 light:text-slate-600">
-              <span className="truncate text-[11px] text-gray-400 light:text-slate-500">https://aifrontdesk.com/your-business</span>
+              <span className="truncate text-[11px] text-gray-400 light:text-slate-500">{QR_TARGET_URL}</span>
               <button type="button" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold">{t.copyBtn}</button>
             </div>
-            <button
-              type="button"
-              className="w-full py-2.5 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:brightness-110 transition"
+            <a
+              href={QR_IMAGE_URL}
+              download="nimbledesk-qr-code.png"
+              className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:brightness-110 transition"
             >
               {t.downloadBtn}
-            </button>
+            </a>
             <a
               href="/c/sample-cafe"
               target="_blank"

@@ -1,8 +1,8 @@
 {
   "name": "NimbleDesk - AI Smart Front-Desk",
   "short_name": "NimbleDesk",
-  "description": "AI-Powered Smart Front-Desk & Customer Engagement Platform",
-  "start_url": "/c/demo",
+  "description": "AI-powered 24/7 Smart Front Desk & Customer Engagement Platform by Nima Sharifi Niko",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#080c09",
   "theme_color": "#39ff14",

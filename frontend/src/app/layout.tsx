@@ -4,7 +4,8 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export const metadata: Metadata = {
   title: "NimbleDesk - Smart Front-Desk & AI Engagement",
-  description: "AI-powered smart front-desk platform for local businesses.",
+  description: "AI-powered 24/7 Smart Front Desk & Customer Engagement Platform by Nima Sharifi Niko",
+  authors: [{ name: "Nima Sharifi Niko" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

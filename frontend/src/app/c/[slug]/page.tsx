@@ -104,6 +104,7 @@ const TRANSLATIONS = {
     hoursReply: "ساعات کاری ما شنبه تا پنجشنبه، از ساعت ۰۹:۰۰ الی ۲۲:۰۰ می‌باشد.",
     servicesReply: "خدمات ما شامل منوی اسپرسوبار، دسرها و رزرو سالن خصوصی است.",
     thanksReply: "ممنون از پیام شما! چطور می‌توانم بیشتر کمکتان کنم؟",
+    footerCopyright: "© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو",
   },
   en: {
     dir: "ltr" as const,
@@ -126,6 +127,7 @@ const TRANSLATIONS = {
     hoursReply: "Our operating hours are Monday to Saturday, 09:00 AM to 10:00 PM.",
     servicesReply: "Our services include espresso bar menu, desserts, and private hall bookings.",
     thanksReply: "Thank you for reaching out! How else can I assist you?",
+    footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
   nl: {
     dir: "ltr" as const,
@@ -148,6 +150,7 @@ const TRANSLATIONS = {
     hoursReply: "Wij zijn open van maandag t/m zaterdag van 09:00 tot 22:00.",
     servicesReply: "Onze diensten omvatten espressobar, desserts en zaalreserveringen.",
     thanksReply: "Bedankt voor uw bericht! Hoe kan ik u verder helpen?",
+    footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
 };
 
@@ -309,8 +312,8 @@ function CustomerChatContent() {
                   type="button"
                   onClick={() => setLang(opt.code)}
                   className={`px-2 py-1 rounded-full text-[10px] font-semibold transition ${lang === opt.code
-                      ? "bg-green-400 text-black shadow-[0_0_12px_rgba(74,222,128,0.5)]"
-                      : "text-gray-400 light:text-slate-500 hover:text-gray-200 light:hover:text-slate-800"
+                    ? "bg-green-400 text-black shadow-[0_0_12px_rgba(74,222,128,0.5)]"
+                    : "text-gray-400 light:text-slate-500 hover:text-gray-200 light:hover:text-slate-800"
                     }`}
                 >
                   {opt.label}
@@ -346,8 +349,8 @@ function CustomerChatContent() {
 
                 <div
                   className={`p-3.5 rounded-2xl text-sm leading-relaxed backdrop-blur-xl ${msg.sender === "user"
-                      ? "bg-green-400 text-black font-medium rounded-br-none shadow-[0_0_20px_rgba(74,222,128,0.35)]"
-                      : "bg-white/5 light:bg-white light:border-slate-200 text-gray-100 light:text-slate-800 border border-white/10 rounded-bl-none"
+                    ? "bg-green-400 text-black font-medium rounded-br-none shadow-[0_0_20px_rgba(74,222,128,0.35)]"
+                    : "bg-white/5 light:bg-white light:border-slate-200 text-gray-100 light:text-slate-800 border border-white/10 rounded-bl-none"
                     }`}
                 >
                   <p className="whitespace-pre-line">{msg.text}</p>
@@ -555,6 +558,11 @@ function CustomerChatContent() {
           </div>
         )}
       </div>
+
+      {/* کپی‌رایت برندینگ — فقط در دسکتاپ، بیرون از کارت چت، بدون تأثیر بر Layout چت */}
+      <p className="hidden md:block fixed bottom-2 inset-x-0 text-center text-[10px] text-gray-600 light:text-slate-400 z-0 pointer-events-none">
+        {t.footerCopyright}
+      </p>
     </div>
   );
 }

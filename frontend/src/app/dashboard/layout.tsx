@@ -29,6 +29,7 @@ const TRANSLATIONS = {
     ownerName: "Alex Thompson",
     ownerRole: "Business Owner",
     langToggle: "فارسی",
+    footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
   fa: {
     brand: "دستیار هوشمند",
@@ -52,6 +53,7 @@ const TRANSLATIONS = {
     ownerName: "الکس تامپسون",
     ownerRole: "صاحب کسب‌وکار",
     langToggle: "English",
+    footerCopyright: "© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو",
   },
 };
 
@@ -163,6 +165,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
               {t.needHelp}
             </span>
             <span>{dir === "rtl" ? "←" : "→"}</span>
+          </div>
+
+          {/* کپی‌رایت برندینگ */}
+          <div className="pt-3 border-t border-white/10 light:border-slate-200 text-center">
+            <p className="text-[9px] text-gray-500 light:text-slate-400 leading-relaxed px-1">
+              {t.footerCopyright}
+            </p>
           </div>
         </div>
       </aside>

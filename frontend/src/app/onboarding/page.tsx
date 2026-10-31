@@ -99,6 +99,7 @@ const TRANSLATIONS = {
     back: "← Back",
     continue: "Continue →",
     launch: "Launch Front Desk 🚀",
+    footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
   fa: {
     dir: "rtl" as const,
@@ -121,6 +122,7 @@ const TRANSLATIONS = {
     back: "→ بازگشت",
     continue: "ادامه ←",
     launch: "راه‌اندازی دستیار 🚀",
+    footerCopyright: "© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو",
   },
 };
 
@@ -189,7 +191,7 @@ export default function OnboardingWizardPage() {
   return (
     <main
       dir={t.dir}
-      className="min-h-screen bg-neutral-950 light:bg-neutral-100 text-white light:text-slate-900 flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-black transition-colors duration-300"
+      className="min-h-screen bg-neutral-950 light:bg-neutral-100 text-white light:text-slate-900 flex flex-col items-center justify-center p-4 selection:bg-emerald-500 selection:text-black transition-colors duration-300"
     >
       <div className="w-full max-w-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 rounded-[2.5rem] p-8 shadow-[0_0_60px_rgba(57,255,20,0.08)] light:shadow-md backdrop-blur-2xl relative space-y-6">
         {/* Step Indicator */}
@@ -378,6 +380,11 @@ export default function OnboardingWizardPage() {
           </button>
         </div>
       </div>
+
+      {/* کپی‌رایت برندینگ */}
+      <p className="mt-6 text-[11px] text-gray-500 light:text-slate-500 text-center">
+        {t.footerCopyright}
+      </p>
     </main>
   );
 }

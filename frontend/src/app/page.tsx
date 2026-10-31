@@ -43,7 +43,7 @@ const TRANSLATIONS = {
     ],
     finalCtaTitle: "Ready to launch your AI Front Desk?",
     finalCtaSubtitle: "Setup takes less than 3 minutes. No credit card required.",
-    footerRights: "All rights reserved.",
+    footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
   fa: {
     dir: "rtl" as const,
@@ -81,7 +81,7 @@ const TRANSLATIONS = {
     ],
     finalCtaTitle: "آماده راه‌اندازی دستیار هوشمند خود هستید؟",
     finalCtaSubtitle: "راه‌اندازی کمتر از ۳ دقیقه طول می‌کشد. نیازی به کارت اعتباری نیست.",
-    footerRights: "تمامی حقوق محفوظ است.",
+    footerCopyright: "© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو",
   },
 };
 
@@ -105,11 +105,6 @@ function MoonIcon() {
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>("en");
   const { theme, toggleTheme } = useTheme();
-  const [year, setYear] = useState<number>(2025);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
 
   const t = TRANSLATIONS[lang];
 
@@ -234,7 +229,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 light:border-slate-200 py-6 text-center">
         <p className="text-[11px] text-gray-500 light:text-slate-500">
-          © {year} {t.brand} — {t.footerRights}
+          {t.footerCopyright}
         </p>
       </footer>
     </main>
