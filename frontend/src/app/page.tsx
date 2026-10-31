@@ -1,191 +1,208 @@
-'use client';
+"use client";
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import Link from "next/link";
 
-type Language = 'fa' | 'en';
+type Lang = "fa" | "en";
 
-const translations = {
-  fa: {
-    dir: 'rtl' as const,
-    title: 'ایجاد حساب کاربری',
-    subtitle: 'برای شروع، اطلاعات زیر را تکمیل کنید',
-    name: 'نام کامل',
-    namePlaceholder: 'مثلاً: علی رضایی',
-    email: 'ایمیل',
-    password: 'رمز عبور',
-    passwordPlaceholder: 'حداقل ۸ کاراکتر',
-    continueBtn: 'ادامه',
-    haveAccount: 'قبلاً ثبت‌نام کرده‌اید؟',
-    login: 'ورود',
-    terms: 'با ادامه، شما قوانین و مقررات ما را می‌پذیرید.',
-    langToggle: 'English',
-    brand: 'دستیار هوشمند',
-  },
+const TRANSLATIONS = {
   en: {
-    dir: 'ltr' as const,
-    title: 'Create your account',
-    subtitle: 'Fill in the details below to get started',
-    name: 'Full name',
-    namePlaceholder: 'e.g. John Doe',
-    email: 'Email',
-    password: 'Password',
-    passwordPlaceholder: 'At least 8 characters',
-    continueBtn: 'Continue',
-    haveAccount: 'Already have an account?',
-    login: 'Log in',
-    terms: 'By continuing, you agree to our Terms & Conditions.',
-    langToggle: 'فارسی',
-    brand: 'AI Front Desk',
+    dir: "ltr" as const,
+    brand: "NimbleDesk",
+    loginBtn: "Log in",
+    heroTitleLine1: "AI Front Desk for",
+    heroTitleHighlight: "Local Businesses",
+    heroSubtitle:
+      "Give your customers an instant, always-on AI assistant that answers questions, books appointments, and never sleeps.",
+    ctaPrimary: "Start Free Trial",
+    ctaSecondary: "See Live Demo",
+    featuresTitle: "Everything your front desk needs",
+    featuresSubtitle: "Built for busy local businesses who can't afford to miss a customer.",
+    features: [
+      {
+        icon: "💬",
+        title: "24/7 Instant Responses",
+        desc: "Your AI assistant answers customer questions instantly, day or night, no breaks needed.",
+      },
+      {
+        icon: "🌐",
+        title: "Multilingual Support",
+        desc: "Chat with customers in Persian, English, Dutch and more — automatically detected.",
+      },
+      {
+        icon: "🧠",
+        title: "Smart Menu & Services",
+        desc: "AI pre-configures your service menu and FAQ templates based on your business type.",
+      },
+      {
+        icon: "📱",
+        title: "Dedicated QR Code",
+        desc: "Generate a unique QR code customers can scan to instantly start chatting with you.",
+      },
+    ],
+    finalCtaTitle: "Ready to launch your AI Front Desk?",
+    finalCtaSubtitle: "Setup takes less than 3 minutes. No credit card required.",
+    footerRights: "All rights reserved.",
+  },
+  fa: {
+    dir: "rtl" as const,
+    brand: "نیمبل‌دسک",
+    loginBtn: "ورود",
+    heroTitleLine1: "دستیار هوشمند ۲۴/۷",
+    heroTitleHighlight: "کسب‌وکار شما",
+    heroSubtitle:
+      "به مشتریان خود یک دستیار هوشمند همیشه‌فعال بدهید که به سؤالات پاسخ می‌دهد، نوبت رزرو می‌کند و هرگز نمی‌خوابد.",
+    ctaPrimary: "شروع رایگان",
+    ctaSecondary: "مشاهده دمو زنده",
+    featuresTitle: "هر آنچه پذیرش شما نیاز دارد",
+    featuresSubtitle: "ساخته شده برای کسب‌وکارهای محلی شلوغ که نمی‌توانند مشتری را از دست بدهند.",
+    features: [
+      {
+        icon: "💬",
+        title: "پاسخگویی ۲۴/۷",
+        desc: "دستیار هوشمند شما شب و روز، بدون وقفه، به سؤالات مشتریان پاسخ فوری می‌دهد.",
+      },
+      {
+        icon: "🌐",
+        title: "پشتیبانی چندزبانه",
+        desc: "با مشتریان به فارسی، انگلیسی، هلندی و بیشتر گفتگو کنید — تشخیص خودکار زبان.",
+      },
+      {
+        icon: "🧠",
+        title: "ساخت هوشمند منو و خدمات",
+        desc: "هوش مصنوعی منوی خدمات و سؤالات متداول شما را بر اساس نوع کسب‌وکار از پیش می‌سازد.",
+      },
+      {
+        icon: "📱",
+        title: "کیوآر کد اختصاصی",
+        desc: "یک کد QR منحصربه‌فرد بسازید که مشتریان با اسکن آن فوراً گفتگو را شروع کنند.",
+      },
+    ],
+    finalCtaTitle: "آماده راه‌اندازی دستیار هوشمند خود هستید؟",
+    finalCtaSubtitle: "راه‌اندازی کمتر از ۳ دقیقه طول می‌کشد. نیازی به کارت اعتباری نیست.",
+    footerRights: "تمامی حقوق محفوظ است.",
   },
 };
 
-/* ---------- آیکون‌های SVG داخلی ---------- */
-const GlobeIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10" />
-    <line x1="2" y1="12" x2="22" y2="12" />
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-  </svg>
-);
-
-const ArrowIcon = ({ flip, className = 'w-4 h-4' }: { flip: boolean; className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    viewBox="0 0 24 24"
-    style={{ transform: flip ? 'scaleX(-1)' : 'none' }}
-  >
-    <line x1="5" y1="12" x2="19" y2="12" />
-    <polyline points="12 5 19 12 12 19" />
-  </svg>
-);
-
-const BotIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-    <rect x="3" y="11" width="18" height="10" rx="2" />
-    <circle cx="12" cy="5" r="2" />
-    <path d="M12 7v4M8 15h.01M16 15h.01" />
-  </svg>
-);
-/* ------------------------------------------- */
-
-export default function SignupPage() {
-  const router = useRouter();
-  const [lang, setLang] = useState<Language>('fa');
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const t = translations[lang];
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const newErrors: { [key: string]: string } = {};
-
-    if (!formData.name.trim()) newErrors.name = lang === 'fa' ? 'نام الزامی است' : 'Name is required';
-    if (!formData.email.trim()) newErrors.email = lang === 'fa' ? 'ایمیل الزامی است' : 'Email is required';
-    if (formData.password.length < 8)
-      newErrors.password = lang === 'fa' ? 'رمز عبور باید حداقل ۸ کاراکتر باشد' : 'Password must be at least 8 characters';
-
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
-      router.push('/onboarding');
-    }
-  };
+export default function LandingPage() {
+  const [lang, setLang] = useState<Lang>("en");
+  const t = TRANSLATIONS[lang];
 
   return (
-    <div dir={t.dir} className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-10">
-      {/* نورهای محو سبز در پس‌زمینه (Ambient Glow) */}
-      <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-green-500/20 blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-emerald-500/20 blur-[120px]" />
-      <div className="pointer-events-none absolute top-1/3 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/10 blur-[100px]" />
+    <main
+      dir={t.dir}
+      className="relative min-h-screen overflow-hidden bg-neutral-950 text-white selection:bg-emerald-500 selection:text-black"
+    >
+      {/* Ambient Glow Background */}
+      <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]" />
+      <div className="pointer-events-none absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-green-500/15 blur-[120px]" />
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/10 blur-[100px]" />
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* هدر: لوگو برند + سوئیچر زبان */}
-        <div className="mb-6 flex items-center justify-between">
+      {/* Header */}
+      <header className="relative z-10 sticky top-0 border-b border-white/10 bg-neutral-950/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-green-500/40 bg-green-500/10 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.25)]">
-              <BotIcon className="h-5 w-5" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-extrabold text-lg shadow-[0_0_15px_rgba(57,255,20,0.35)]">
+              ⬡
             </div>
-            <span className="text-sm font-bold text-white">{t.brand}</span>
+            <span className="text-sm sm:text-base font-bold text-white">{t.brand}</span>
           </div>
 
-          <button
-            onClick={() => setLang(lang === 'fa' ? 'en' : 'fa')}
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 backdrop-blur-xl transition hover:bg-white/10"
-          >
-            <GlobeIcon className="h-3.5 w-3.5 text-green-400" />
-            {t.langToggle}
-          </button>
-        </div>
-
-        {/* کارت شیشه‌ای اصلی */}
-        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 shadow-2xl backdrop-blur-2xl">
-          <h1 className="text-center text-2xl font-bold text-white">{t.title}</h1>
-          <p className="mt-2 text-center text-sm text-gray-400">{t.subtitle}</p>
-
-          <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-300">{t.name}</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                placeholder={t.namePlaceholder}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 outline-none backdrop-blur-xl transition focus:border-green-400/60 focus:shadow-[0_0_15px_rgba(74,222,128,0.25)]"
-              />
-              {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-300">{t.email}</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                placeholder="example@email.com"
-                dir="ltr"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 outline-none backdrop-blur-xl transition focus:border-green-400/60 focus:shadow-[0_0_15px_rgba(74,222,128,0.25)]"
-              />
-              {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-gray-300">{t.password}</label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-                placeholder={t.passwordPlaceholder}
-                dir="ltr"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-gray-500 outline-none backdrop-blur-xl transition focus:border-green-400/60 focus:shadow-[0_0_15px_rgba(74,222,128,0.25)]"
-              />
-              {errors.password && <p className="mt-1 text-xs text-red-400">{errors.password}</p>}
-            </div>
-
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             <button
-              type="submit"
-              className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-green-400 px-4 py-3 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:bg-green-300 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)]"
+              type="button"
+              onClick={() => setLang(lang === "en" ? "fa" : "en")}
+              className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 backdrop-blur-xl transition hover:border-emerald-500/40"
             >
-              {t.continueBtn}
-              <ArrowIcon flip={t.dir === 'rtl'} />
+              🌐 {lang === "en" ? "FA" : "EN"}
             </button>
-          </form>
 
-          <p className="mt-6 text-center text-xs text-gray-500">{t.terms}</p>
-
-          <p className="mt-4 text-center text-sm text-gray-400">
-            {t.haveAccount}{' '}
-            <a href="/login" className="font-semibold text-green-400 transition hover:text-green-300">
-              {t.login}
-            </a>
-          </p>
+            <Link
+              href="/dashboard"
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold text-gray-200 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400"
+            >
+              {t.loginBtn}
+            </Link>
+          </div>
         </div>
-      </div>
-    </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative z-10 mx-auto max-w-4xl px-5 pt-16 pb-14 text-center sm:px-8 sm:pt-24 sm:pb-20">
+        <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+          {t.heroTitleLine1}{" "}
+          <span className="bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
+            {t.heroTitleHighlight}
+          </span>
+        </h1>
+
+        <p className="mx-auto mt-5 max-w-2xl text-sm text-gray-400 sm:text-base">
+          {t.heroSubtitle}
+        </p>
+
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/signup"
+            className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-7 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)] text-center"
+          >
+            {t.ctaPrimary} →
+          </Link>
+
+          <a
+            href="/c/sample-cafe"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto rounded-2xl border border-white/10 bg-white/5 px-7 py-3.5 text-sm font-semibold text-gray-200 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400 text-center"
+          >
+            {t.ctaSecondary}
+          </a>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="relative z-10 mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24">
+        <div className="text-center mb-10">
+          <h2 className="text-xl font-bold text-white sm:text-3xl">{t.featuresTitle}</h2>
+          <p className="mt-2 text-xs text-gray-400 sm:text-sm">{t.featuresSubtitle}</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {t.features.map((f, idx) => (
+            <div
+              key={idx}
+              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
+            >
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
+                {f.icon}
+              </div>
+              <h3 className="text-sm font-bold text-white">{f.title}</h3>
+              <p className="mt-1.5 text-xs text-gray-400 leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Final CTA Band */}
+      <section className="relative z-10 mx-auto max-w-4xl px-5 pb-20 sm:px-8 sm:pb-28">
+        <div className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 text-center backdrop-blur-2xl shadow-[0_0_60px_rgba(57,255,20,0.08)] sm:p-12">
+          <h2 className="text-lg font-bold text-white sm:text-2xl">{t.finalCtaTitle}</h2>
+          <p className="mt-2 text-xs text-gray-400 sm:text-sm">{t.finalCtaSubtitle}</p>
+
+          <Link
+            href="/signup"
+            className="mt-6 inline-block rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)]"
+          >
+            {t.ctaPrimary} →
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/10 py-6 text-center">
+        <p className="text-[11px] text-gray-500">
+          © {new Date().getFullYear()} {t.brand} — {t.footerRights}
+        </p>
+      </footer>
+    </main>
   );
 }

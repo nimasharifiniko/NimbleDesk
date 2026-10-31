@@ -198,8 +198,8 @@ export default function OnboardingWizardPage() {
                   type="button"
                   onClick={() => setSelectedIndustryId(ind.id)}
                   className={`p-4 rounded-2xl border text-start transition flex flex-col justify-between gap-2 backdrop-blur-xl ${selectedIndustry.id === ind.id
-                      ? "bg-emerald-500/15 border-emerald-400 shadow-[0_0_20px_rgba(57,255,20,0.2)]"
-                      : "bg-white/5 border-white/10 hover:border-white/20"
+                    ? "bg-emerald-500/15 border-emerald-400 shadow-[0_0_20px_rgba(57,255,20,0.2)]"
+                    : "bg-white/5 border-white/10 hover:border-white/20"
                     }`}
                 >
                   <div className="text-2xl">{ind.icon}</div>
