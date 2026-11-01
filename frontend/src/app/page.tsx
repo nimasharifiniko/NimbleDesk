@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -111,7 +111,7 @@ export default function LandingPage() {
   return (
     <main
       dir={t.dir}
-      className="relative min-h-screen overflow-hidden bg-neutral-950 light:bg-neutral-100 text-white light:text-slate-900 selection:bg-emerald-500 selection:text-black transition-colors duration-300"
+      className="w-full overflow-x-hidden relative min-h-screen bg-neutral-950 light:bg-neutral-100 text-white light:text-slate-900 selection:bg-emerald-500 selection:text-black transition-colors duration-300"
     >
       {/* Ambient Glow Background */}
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]" />
@@ -119,9 +119,9 @@ export default function LandingPage() {
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-lime-500/10 blur-[100px]" />
 
       {/* Header */}
-      <header className="relative z-10 sticky top-0 border-b border-white/10 light:border-slate-200 bg-neutral-950/70 light:bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-          <div className="flex items-center gap-2.5">
+      <header className="w-full relative z-10 sticky top-0 border-b border-white/10 light:border-slate-200 bg-neutral-950/70 light:bg-white/80 backdrop-blur-xl">
+        <div className="w-full mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
+          <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-black font-extrabold text-lg shadow-[0_0_15px_rgba(57,255,20,0.35)]">
               ⬡
             </div>
@@ -157,8 +157,8 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 mx-auto max-w-4xl px-5 pt-16 pb-14 text-center sm:px-8 sm:pt-24 sm:pb-20">
-        <h1 className="text-3xl font-extrabold leading-tight text-white light:text-slate-900 sm:text-5xl lg:text-6xl">
+      <section className="w-full relative z-10 mx-auto max-w-4xl px-4 pt-16 pb-14 text-center sm:px-8 sm:pt-24 sm:pb-20">
+        <h1 className="text-4xl font-extrabold leading-tight text-white light:text-slate-900 sm:text-5xl lg:text-6xl">
           {t.heroTitleLine1}{" "}
           <span className="bg-gradient-to-r from-emerald-400 to-green-500 bg-clip-text text-transparent">
             {t.heroTitleHighlight}
@@ -169,10 +169,10 @@ export default function LandingPage() {
           {t.heroSubtitle}
         </p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <div className="w-full mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/signup"
-            className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-7 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)] text-center"
+            className="w-full sm:w-auto flex items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-7 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)] text-center"
           >
             {t.ctaPrimary} →
           </Link>
@@ -181,7 +181,7 @@ export default function LandingPage() {
             href="/c/sample-cafe"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 px-7 py-3.5 text-sm font-semibold text-gray-200 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400 text-center"
+            className="w-full sm:w-auto flex items-center justify-center rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 px-7 py-3.5 text-sm font-semibold text-gray-200 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40 hover:text-emerald-400 text-center"
           >
             {t.ctaSecondary}
           </a>
@@ -189,17 +189,17 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="relative z-10 mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24">
+      <section className="w-full relative z-10 mx-auto max-w-6xl px-4 pb-16 sm:px-8 sm:pb-24">
         <div className="text-center mb-10">
-          <h2 className="text-xl font-bold text-white light:text-slate-900 sm:text-3xl">{t.featuresTitle}</h2>
+          <h2 className="text-2xl font-bold text-white light:text-slate-900 sm:text-3xl">{t.featuresTitle}</h2>
           <p className="mt-2 text-xs text-gray-400 light:text-slate-600 sm:text-sm">{t.featuresSubtitle}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="w-full grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {t.features.map((f, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
+              className="w-full rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
             >
               <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
                 {f.icon}
@@ -212,14 +212,14 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA Band */}
-      <section className="relative z-10 mx-auto max-w-4xl px-5 pb-20 sm:px-8 sm:pb-28">
-        <div className="rounded-[2.5rem] border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-8 text-center backdrop-blur-2xl shadow-[0_0_60px_rgba(57,255,20,0.08)] sm:p-12">
-          <h2 className="text-lg font-bold text-white light:text-slate-900 sm:text-2xl">{t.finalCtaTitle}</h2>
-          <p className="mt-2 text-xs text-gray-400 light:text-slate-600 sm:text-sm">{t.finalCtaSubtitle}</p>
+      <section className="w-full relative z-10 mx-auto max-w-4xl px-4 pb-20 sm:px-8 sm:pb-28">
+        <div className="w-full rounded-[2.5rem] border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-8 text-center backdrop-blur-2xl shadow-[0_0_60px_rgba(57,255,20,0.08)] sm:p-12">
+          <h2 className="text-xl font-bold text-white light:text-slate-900 sm:text-3xl">{t.finalCtaTitle}</h2>
+          <p className="mt-3 text-sm text-gray-400 light:text-slate-600 sm:text-base">{t.finalCtaSubtitle}</p>
 
           <Link
             href="/signup"
-            className="mt-6 inline-block rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)]"
+            className="w-full sm:w-auto mt-8 flex sm:inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)]"
           >
             {t.ctaPrimary} →
           </Link>
@@ -227,7 +227,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 light:border-slate-200 py-6 text-center">
+      <footer className="w-full relative z-10 border-t border-white/10 light:border-slate-200 py-6 text-center px-4">
         <p className="text-[11px] text-gray-500 light:text-slate-500">
           {t.footerCopyright}
         </p>
