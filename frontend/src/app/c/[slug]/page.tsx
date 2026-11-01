@@ -209,32 +209,39 @@ function CustomerChatContent() {
       timestamp: nowTime(),
     };
 
+    // آماده‌سازی تاریخچه پیام‌ها برای ارسال به API هوش مصنوعی (نقش کاربر و دستیار)
+    const apiMessages = messages.map((m) => ({
+      role: m.sender === "user" ? "user" : "assistant",
+      content: m.text,
+    }));
+    apiMessages.push({ role: "user", content: textToSend });
+
     setMessages((prev) => [...prev, userMsg]);
     if (!overrideText) setInput("");
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      // ارسال درخواست به Route Handler داخلی (Next.js)
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          business_slug: slug,
-          message: textToSend,
-          lang,
+          messages: apiMessages,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) throw new Error("Failed to fetch from API");
 
       const data = await res.json();
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: data.response || data.text || t.thanksReply,
+        text: data.response || t.thanksReply,
         timestamp: nowTime(),
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch {
+      // Fallback: اگر API خطا داد (مثلاً اینترنت قطع بود یا کلید تنظیم نبود)
       let reply = t.thanksReply;
       if (intent === "hours") reply = t.hoursReply;
       else if (intent === "services") reply = t.servicesReply;
@@ -392,12 +399,13 @@ function CustomerChatContent() {
             </div>
           ))}
 
+          {/* Typing Indicator متحرک */}
           {loading && (
             <div className="flex items-end gap-2">
               <div className="w-7 h-7 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-400 flex-shrink-0">
                 <BotIcon className="w-3.5 h-3.5" />
               </div>
-              <div className="flex items-center gap-1 rounded-2xl rounded-bl-none bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl px-4 py-3">
+              <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-none bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl px-4 py-4">
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-green-400 [animation-delay:-0.3s]" />
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-green-400 [animation-delay:-0.15s]" />
                 <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-green-400" />
