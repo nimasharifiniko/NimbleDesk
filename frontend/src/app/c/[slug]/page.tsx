@@ -276,42 +276,42 @@ function CustomerChatContent() {
 
   return (
     <div
-      className="relative min-h-screen bg-neutral-950 light:bg-neutral-100 text-gray-100 light:text-slate-900 flex justify-center items-center p-0 md:p-6 font-sans overflow-hidden transition-colors duration-300"
+      className="relative flex flex-col h-[100dvh] max-h-[100dvh] w-full overflow-hidden bg-neutral-950 light:bg-neutral-100 text-gray-100 light:text-slate-900 font-sans transition-colors duration-300 md:items-center md:justify-center md:p-6"
       dir={t.dir}
     >
-      {/* نورهای محو سبز پس‌زمینه (Ambient Glow) */}
-      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-green-500/20 blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-emerald-500/20 blur-[120px]" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-500/10 blur-[100px]" />
+      {/* نورهای محو سبز پس‌زمینه (Ambient Glow) — فقط دسکتاپ */}
+      <div className="pointer-events-none hidden md:block absolute -top-24 -left-24 h-80 w-80 rounded-full bg-green-500/20 blur-[120px]" />
+      <div className="pointer-events-none hidden md:block absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-emerald-500/20 blur-[120px]" />
+      <div className="pointer-events-none hidden md:block absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-500/10 blur-[100px]" />
 
-      <div className="relative z-10 w-full max-w-md h-screen md:h-[840px] bg-white/[0.04] light:bg-white/90 border border-white/10 light:border-slate-200 rounded-none md:rounded-3xl shadow-2xl light:shadow-md backdrop-blur-2xl flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-white/[0.03] light:bg-white/80 border-b border-white/10 light:border-slate-200 p-4 flex items-center justify-between z-10 backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-green-500/10 border border-green-500/40 flex items-center justify-center text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+      <div className="relative z-10 w-full h-full md:max-w-md md:h-[840px] md:max-h-[90vh] bg-white/[0.04] light:bg-white/90 border-0 md:border md:border-white/10 md:light:border-slate-200 rounded-none md:rounded-3xl shadow-2xl light:shadow-md backdrop-blur-2xl flex flex-col overflow-hidden">
+        {/* Header — flex-none + sticky top-0 برای ماندگاری در موبایل */}
+        <div className="flex-none sticky top-0 z-20 w-full bg-white/[0.03] light:bg-white/80 border-b border-white/10 light:border-slate-200 px-4 py-3 sm:px-6 flex items-center justify-between gap-2 backdrop-blur-xl">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-2xl bg-green-500/10 border border-green-500/40 flex items-center justify-center text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.3)] shrink-0">
               <BotIcon className="w-5 h-5" />
             </div>
-            <div>
-              <h1 className="font-bold text-white light:text-slate-900 text-base capitalize">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-bold text-white light:text-slate-900 text-sm sm:text-base capitalize truncate">
                 {slug.replace(/-/g, " ")}
               </h1>
-              <p className="text-xs text-green-400 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span>
-                {t.subtitle}
+              <p className="text-[10px] sm:text-xs text-green-400 flex items-center gap-1 truncate">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)] shrink-0"></span>
+                <span className="truncate">{t.subtitle}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0">
             {/* سوئیچر ۳ زبانه */}
-            <div className="flex items-center gap-1 px-1 py-1 rounded-full bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl">
-              <GlobeIcon className="w-3.5 h-3.5 text-green-400 mx-1" />
+            <div className="flex items-center gap-0.5 px-1 py-1 rounded-full bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl">
+              <GlobeIcon className="w-3.5 h-3.5 text-green-400 mx-0.5 shrink-0" />
               {langOptions.map((opt) => (
                 <button
                   key={opt.code}
                   type="button"
                   onClick={() => setLang(opt.code)}
-                  className={`px-2 py-1 rounded-full text-[10px] font-semibold transition ${lang === opt.code
+                  className={`px-1.5 sm:px-2 py-1 rounded-full text-[10px] font-semibold transition ${lang === opt.code
                     ? "bg-green-400 text-black shadow-[0_0_12px_rgba(74,222,128,0.5)]"
                     : "text-gray-400 light:text-slate-500 hover:text-gray-200 light:hover:text-slate-800"
                     }`}
@@ -326,14 +326,14 @@ function CustomerChatContent() {
               type="button"
               onClick={toggleTheme}
               aria-label="Toggle theme"
-              className="flex items-center justify-center rounded-full bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 p-2 text-gray-300 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40"
+              className="flex items-center justify-center rounded-full bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 p-2 text-gray-300 light:text-slate-600 backdrop-blur-xl transition hover:border-emerald-500/40 shrink-0"
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
           </div>
         </div>
 
-        {/* Chat Messages */}
+        {/* Chat Messages — flex-1 برای پر کردن فضای میانی */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, index) => (
             <div
@@ -408,8 +408,8 @@ function CustomerChatContent() {
           <div ref={chatEndRef} />
         </div>
 
-        {/* Quick Buttons — اسکرول‌بار کاملاً مخفی */}
-        <div className="px-3 py-2 bg-white/[0.02] light:bg-white/60 border-t border-white/10 light:border-slate-200 flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {/* Quick Buttons — flex-none */}
+        <div className="flex-none px-3 py-2 bg-white/[0.02] light:bg-white/60 border-t border-white/10 light:border-slate-200 flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <button
             type="button"
             onClick={() => setShowBookingModal(true)}
@@ -434,8 +434,8 @@ function CustomerChatContent() {
           </button>
         </div>
 
-        {/* Input Bar */}
-        <div className="p-3 bg-white/[0.03] light:bg-white/80 border-t border-white/10 light:border-slate-200 flex items-center gap-2 backdrop-blur-xl">
+        {/* Input Bar — flex-none ثابت در پایین */}
+        <div className="flex-none p-3 sm:p-4 bg-white/[0.03] light:bg-white/80 border-t border-white/10 light:border-slate-200 flex items-center gap-2 backdrop-blur-xl">
           <div className="flex-1 flex items-center gap-2 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 focus-within:border-green-400/60 rounded-2xl px-4 transition">
             <input
               type="text"
@@ -459,7 +459,7 @@ function CustomerChatContent() {
 
         {/* Booking Modal */}
         {showBookingModal && (
-          <div className="absolute inset-0 z-20 flex items-end md:items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="absolute inset-0 z-30 flex items-end md:items-center justify-center bg-black/70 backdrop-blur-sm p-4">
             <div className="w-full max-w-sm bg-white/[0.06] light:bg-white border border-white/10 light:border-slate-200 rounded-3xl shadow-2xl light:shadow-xl backdrop-blur-2xl p-5 relative">
               <button
                 type="button"
@@ -476,7 +476,7 @@ function CustomerChatContent() {
                 <>
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-9 h-9 rounded-xl bg-green-500/10 border border-green-500/40 flex items-center justify-center text-green-400 shadow-[0_0_15px_rgba(74,222,128,0.3)]">
-                      <CalendarIcon className="w-4.5 h-4.5" />
+                      <CalendarIcon className="w-4 h-4" />
                     </div>
                     <h2 className="font-bold text-white light:text-slate-900">{t.modalTitle}</h2>
                   </div>
