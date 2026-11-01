@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
 
-const SYSTEM_PROMPT = `شما دستیار هوشمند 24/7 در Sample Cafe هستید. اطلاعات کافه: ساعت کاری همه روزه از ۹:۰۰ تا ۲۲:۰۰. منو: اسپرسو (۴۵ هزار تومان)، آیس لاته (۶۵ هزار تومان)، کیک روز. امکان رزرو میز وجود دارد.
-اگر کاربر درباره کافه پرسید، دقیق بر اساس این اطلاعات پاسخ بده.
-اگر کاربر سوال عمومی، علمی یا نامربوط (مثلاً تعمیر ماشین سمند، دلیل تلخی قهوه، یا قیمت ماشین) پرسید، با دانش عمومی خودت به عنوان یک دستیار دانشمند، مودب و باحوصله کاملاً پاسخ بده! پاسخ‌ها کوتاه، جذاب و به زبان کاربر (فارسی/انگلیسی/هلندی) باشد.`;
-
 const MODELS = [
   "openrouter/auto",
   "deepseek/deepseek-r1:free",
@@ -15,7 +11,7 @@ const MODELS = [
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messages } = body;
+    const { messages, customServices } = body;
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
@@ -25,14 +21,33 @@ export async function POST(req: Request) {
       );
     }
 
+    // تولید System Prompt به صورت داینامیک
+    let systemPromptText = `شما دستیار هوشمند 24/7 در Sample Cafe هستید. اطلاعات کافه: ساعت کاری همه روزه از ۹:۰۰ تا ۲۲:۰۰. منو: اسپرسو (۴۵ هزار تومان)، آیس لاته (۶۵ هزار تومان)، کیک روز. امکان رزرو میز وجود دارد.
+اگر کاربر درباره کافه پرسید، دقیق بر اساس این اطلاعات پاسخ بده.
+اگر کاربر سوال عمومی، علمی یا نامربوط (مثلاً تعمیر ماشین سمند، دلیل تلخی قهوه، یا قیمت ماشین) پرسید، با دانش عمومی خودت به عنوان یک دستیار دانشمند، مودب و باحوصله کاملاً پاسخ بده! پاسخ‌ها کوتاه، جذاب و به زبان کاربر (فارسی/انگلیسی/هلندی) باشد.`;
+
+    // اگر خدمات اختصاصی از Onboarding ارسال شده باشد، پرامپت تغییر می‌کند
+    if (customServices && Array.isArray(customServices)) {
+      const activeServices = customServices.filter((s: any) => s.active);
+      if (activeServices.length > 0) {
+        const servicesListText = activeServices.map((s: any) => `- ${s.name}: ${s.price}`).join("\n");
+        systemPromptText = `شما دستیار هوشمند 24/7 یک کسب‌وکار هستید.
+ساعت کاری: همه روزه از ۹:۰۰ تا ۲۲:۰۰.
+خدمات و قیمت‌های فعال کسب‌وکار:
+${servicesListText}
+
+اگر کاربر درباره هر کدام از این خدمات یا قیمت‌ها پرسید، دقیقاً بر اساس این اطلاعات پاسخ بده.
+اگر کاربر سوال عمومی، علمی یا نامربوط (مثلاً تعمیر ماشین سمند، دلیل تلخی قهوه، یا قیمت ماشین) پرسید، با دانش عمومی خودت به عنوان یک دستیار دانشمند، مودب و باحوصله کاملاً پاسخ بده! پاسخ‌ها کوتاه، جذاب و به زبان کاربر (فارسی/انگلیسی/هلندی) باشد.`;
+      }
+    }
+
     const openRouterMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemPromptText },
       ...(messages || []),
     ];
 
     let lastError = "";
 
-    // پیمایش روی لیست مدل‌ها تا اولین پاسخ موفق (Status 200)
     for (const model of MODELS) {
       try {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -66,7 +81,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // اگر تمام مدل‌های آرایه با خطا مواجه شدند
     return NextResponse.json(
       { error: `ارتباط با هیچ‌یک از مدل‌های هوش مصنوعی برقرار نشد. آخرین خطا: ${lastError}` },
       { status: 502 }
