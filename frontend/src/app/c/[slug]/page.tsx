@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useParams } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
-import { decodeBiz } from "@/lib/bizCodec";
+import { decodeBiz } from "../../../lib/bizCodec";
 
 type Lang = "fa" | "en" | "nl";
 
@@ -297,8 +297,11 @@ function CustomerChatContent() {
         timestamp: nowTime(),
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch (err: any) {
-      const errorMsg = err.message || "متاسفانه ارتباط با هوش مصنوعی برقرار نشد.";
+    } catch (err) {
+      const errorMsg =
+        err instanceof Error && err.message
+          ? err.message
+          : "متاسفانه ارتباط با هوش مصنوعی برقرار نشد.";
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",

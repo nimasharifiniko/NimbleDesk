@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useDashboardLang } from "@/contexts/DashboardLangContext";
-import { encodeBiz } from "@/lib/bizCodec";
+import { encodeBiz } from "../../lib/bizCodec";
 
 type Lang = "fa" | "en";
 
