@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useDashboardLang } from "@/contexts/DashboardLangContext";
+import { encodeBiz } from "@/lib/bizCodec";
 
 type Lang = "fa" | "en";
 
@@ -30,6 +31,8 @@ const TRANSLATIONS = {
     copiedBtn: "Copied ✓",
     downloadBtn: "↓ Download QR Code",
     previewChat: "💬 Preview Customer Chat",
+    qrTrimmed: (used: number, total: number) =>
+      `Only ${used} of ${total} services fit in the QR code.`,
     uploadTitle: "Upload Documents",
     uploadSubtitle: "Upload PDF documents to train your AI",
     dragDrop: "Drag & drop your PDF files here",
@@ -72,6 +75,8 @@ const TRANSLATIONS = {
     copiedBtn: "کپی شد ✓",
     downloadBtn: "↓ دانلود کد QR",
     previewChat: "💬 پیش‌نمایش چت مشتری",
+    qrTrimmed: (used: number, total: number) =>
+      `فقط ${used.toLocaleString("fa-IR")} خدمت از ${total.toLocaleString("fa-IR")} خدمت در کد QR جا شد.`,
     uploadTitle: "آپلود اسناد",
     uploadSubtitle: "اسناد PDF را برای آموزش هوش مصنوعی آپلود کنید",
     dragDrop: "فایل‌های PDF خود را اینجا بکشید و رها کنید",
@@ -103,6 +108,14 @@ const TRANSLATIONS = {
 const SITE_BASE_URL = "https://nimble-desk.vercel.app";
 // اگر Onboarding انجام نشده باشد از این slug نمونه استفاده می‌شود
 const FALLBACK_SLUG = "sample-cafe";
+// سقف طول آدرس انکودشده‌ی داخل QRServer (سرویس حدود ۹۰۰ کاراکتر را تحمل می‌کند)
+const QR_DATA_BUDGET = 880;
+
+interface BizInfo {
+  encoded: string; // رشته Base64 فشرده (خالی = بدون داده)
+  usedServices: number;
+  totalServices: number;
+}
 
 export default function BusinessDashboardOverview() {
   const { lang, setLang } = useDashboardLang();
@@ -118,21 +131,35 @@ export default function BusinessDashboardOverview() {
   // slug چت مشتری (null = هنوز از localStorage خوانده نشده)
   const [slug, setSlug] = useState<string | null>(null);
 
+  // داده‌ی فشرده‌ی کسب‌وکار که داخل لینک QR می‌رود
+  const [biz, setBiz] = useState<BizInfo | null>(null);
+
   // وضعیت دکمه کپی
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // پروفایل
+    let parsedProfile: BusinessProfile | null = null;
     try {
       const raw = localStorage.getItem("nimble_profile");
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === "object") {
-          setProfile(parsed as BusinessProfile);
+          parsedProfile = parsed as BusinessProfile;
+          setProfile(parsedProfile);
         }
       }
     } catch {
       // داده خراب در localStorage؛ از متن پیش‌فرض استفاده می‌شود
+    }
+
+    // خدمات
+    let parsedServices: unknown = [];
+    try {
+      const rawServices = localStorage.getItem("nimble_services");
+      if (rawServices) parsedServices = JSON.parse(rawServices);
+    } catch {
+      // داده خراب؛ بدون خدمات ادامه می‌دهیم
     }
 
     // slug ذخیره‌شده در Onboarding
@@ -148,7 +175,21 @@ export default function BusinessDashboardOverview() {
     } catch {
       // داده خراب؛ از slug نمونه استفاده می‌شود
     }
-    setSlug(savedSlug || FALLBACK_SLUG);
+    const finalSlug = savedSlug || FALLBACK_SLUG;
+
+    // محاسبه‌ی سقف طول داده بر اساس طول آدرس پایه (slug فارسی بعد از انکود طولانی می‌شود)
+    const baseLen = encodeURIComponent(
+      `${SITE_BASE_URL}/c/${encodeURIComponent(finalSlug)}?biz=`
+    ).length;
+    const maxChars = Math.max(200, QR_DATA_BUDGET - baseLen);
+
+    const result = encodeBiz(
+      { profile: parsedProfile, services: parsedServices },
+      maxChars
+    );
+
+    setBiz(result);
+    setSlug(finalSlug);
   }, []);
 
   useEffect(() => {
@@ -171,15 +212,20 @@ export default function BusinessDashboardOverview() {
     );
   }, [lang]);
 
-  // آدرس‌های وابسته به slug (تا زمانی که slug خوانده نشده، null هستند)
-  const ready = slug !== null;
-  const chatPath = ready ? `/c/${encodeURIComponent(slug)}` : null;
+  // آدرس‌های وابسته به slug و داده‌ی کسب‌وکار (تا زمانی که خوانده نشده، null هستند)
+  const ready = slug !== null && biz !== null;
+  const chatPath =
+    ready && slug
+      ? `/c/${encodeURIComponent(slug)}${biz && biz.encoded ? `?biz=${biz.encoded}` : ""}`
+      : null;
   const qrTargetUrl = chatPath ? `${SITE_BASE_URL}${chatPath}` : null;
   const qrImageUrl = qrTargetUrl
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-      qrTargetUrl
-    )}&color=10b981&bgcolor=080c09`
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&ecc=L&data=${encodeURIComponent(
+        qrTargetUrl
+      )}&color=10b981&bgcolor=080c09`
     : null;
+
+  const servicesTrimmed = !!biz && biz.usedServices < biz.totalServices;
 
   // کپی لینک چت (داخل event handler)
   const handleCopy = async () => {
@@ -300,12 +346,20 @@ export default function BusinessDashboardOverview() {
                 {copied ? t.copiedBtn : t.copyBtn}
               </button>
             </div>
+
+            {servicesTrimmed && biz && (
+              <p className="text-[10px] text-amber-400 light:text-amber-600 px-1">
+                {t.qrTrimmed(biz.usedServices, biz.totalServices)}
+              </p>
+            )}
+
             <a
               href={qrImageUrl ?? "#"}
               download="nimbledesk-qr-code.png"
               aria-disabled={!ready}
-              className={`w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:brightness-110 transition ${ready ? "" : "pointer-events-none opacity-60"
-                }`}
+              className={`w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:brightness-110 transition ${
+                ready ? "" : "pointer-events-none opacity-60"
+              }`}
             >
               {t.downloadBtn}
             </a>
@@ -314,8 +368,9 @@ export default function BusinessDashboardOverview() {
               target="_blank"
               rel="noopener noreferrer"
               aria-disabled={!ready}
-              className={`w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-gray-300 light:text-slate-600 hover:text-emerald-400 font-semibold text-xs rounded-xl backdrop-blur-xl transition ${ready ? "" : "pointer-events-none opacity-60"
-                }`}
+              className={`w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-gray-300 light:text-slate-600 hover:text-emerald-400 font-semibold text-xs rounded-xl backdrop-blur-xl transition ${
+                ready ? "" : "pointer-events-none opacity-60"
+              }`}
             >
               {t.previewChat}
             </a>

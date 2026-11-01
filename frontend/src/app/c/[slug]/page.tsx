@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useParams } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
+import { decodeBiz } from "@/lib/bizCodec";
 
 type Lang = "fa" | "en" | "nl";
 
@@ -152,9 +153,18 @@ const TRANSLATIONS = {
   },
 };
 
+// slug فارسی ممکن است به‌صورت %D9%85... در params بیاید؛ امن دکودش می‌کنیم
+function safeDecode(v: string): string {
+  try {
+    return decodeURIComponent(v);
+  } catch {
+    return v;
+  }
+}
+
 function CustomerChatContent() {
   const params = useParams();
-  const slug = (params?.slug as string) || "sample-cafe";
+  const slug = safeDecode((params?.slug as string) || "sample-cafe");
   const { theme, toggleTheme } = useTheme();
 
   const [lang, setLang] = useState<Lang>("fa");
@@ -162,8 +172,9 @@ function CustomerChatContent() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // پروفایل کسب‌وکار (فقط بعد از mount از localStorage خوانده می‌شود → بدون Hydration Error)
+  // پروفایل و خدمات کسب‌وکار (فقط بعد از mount از ?biz= یا localStorage پر می‌شوند → بدون Hydration Error)
   const [profile, setProfile] = useState<BusinessProfile | null>(null);
+  const [services, setServices] = useState<unknown[] | null>(null);
 
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -179,18 +190,42 @@ function CustomerChatContent() {
   const nowTime = () =>
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  // خواندن پروفایل از localStorage
+  // خواندن اطلاعات کسب‌وکار: اول ?biz= (QR)، بعد localStorage
   useEffect(() => {
+    // ۱) پارامتر biz داخل آدرس (اسکن QR از هر گوشی)
     try {
-      const raw = localStorage.getItem("nimble_profile");
-      if (raw) {
-        const parsed = JSON.parse(raw);
+      const bizParam = new URLSearchParams(window.location.search).get("biz");
+      const decoded = decodeBiz(bizParam);
+      if (decoded) {
+        setProfile(decoded.profile);
+        setServices(decoded.services);
+        return;
+      }
+    } catch (e) {
+      console.warn("Could not decode biz param", e);
+    }
+
+    // ۲) Fallback: localStorage همین مرورگر
+    try {
+      const rawProfile = localStorage.getItem("nimble_profile");
+      if (rawProfile) {
+        const parsed = JSON.parse(rawProfile);
         if (parsed && typeof parsed === "object") {
           setProfile(parsed as BusinessProfile);
         }
       }
     } catch (e) {
       console.warn("Could not read nimble_profile from localStorage", e);
+    }
+
+    try {
+      const rawServices = localStorage.getItem("nimble_services");
+      if (rawServices) {
+        const parsed = JSON.parse(rawServices);
+        if (Array.isArray(parsed)) setServices(parsed);
+      }
+    } catch (e) {
+      console.warn("Could not read nimble_services from localStorage", e);
     }
   }, []);
 
@@ -239,23 +274,12 @@ function CustomerChatContent() {
     setLoading(true);
 
     try {
-      // خواندن خدمات تنظیم‌شده توسط صاحب کسب‌وکار (داخل event handler، امن برای Hydration)
-      let customServices = null;
-      try {
-        const stored = localStorage.getItem("nimble_services");
-        if (stored) {
-          customServices = JSON.parse(stored);
-        }
-      } catch (e) {
-        console.warn("Could not read nimble_services from localStorage", e);
-      }
-
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: apiMessages,
-          customServices,
+          customServices: services,
           businessProfile: profile,
         }),
       });
