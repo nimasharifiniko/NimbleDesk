@@ -1,10 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DashboardLangProvider, useDashboardLang } from "@/contexts/DashboardLangContext";
 import { useTheme } from "@/contexts/ThemeContext";
+
+interface BusinessProfile {
+  managerName?: string;
+  businessName?: string;
+  phone?: string;
+  address?: string;
+}
 
 const TRANSLATIONS = {
   en: {
@@ -26,7 +33,7 @@ const TRANSLATIONS = {
     interactions: "1178 / 1500 interactions",
     needHelp: "Need help?",
     searchPlaceholder: "Search anything...",
-    ownerName: "Alex Thompson",
+    ownerName: "Manager",
     ownerRole: "Business Owner",
     langToggle: "فارسی",
     footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
@@ -50,12 +57,28 @@ const TRANSLATIONS = {
     interactions: "۱۱۷۸ / ۱۵۰۰ تعامل",
     needHelp: "نیاز به کمک دارید؟",
     searchPlaceholder: "جستجو کنید...",
-    ownerName: "الکس تامپسون",
+    ownerName: "مدیر",
     ownerRole: "صاحب کسب‌وکار",
     langToggle: "English",
     footerCopyright: "© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو",
   },
 };
+
+/* حروف اول نام (حداکثر ۲ حرف): «علی رضایی» → «ع‌ر» ، «Alex Thompson» → «AT» */
+function getInitials(fullName: string): string {
+  const words = fullName.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "";
+
+  const first = Array.from(words[0])[0] ?? "";
+  const second = words.length > 1 ? Array.from(words[1])[0] ?? "" : "";
+  const isArabicScript = /[\u0600-\u06FF]/.test(first);
+
+  if (isArabicScript) {
+    // نیم‌فاصله بین دو حرف فارسی تا به هم نچسبند
+    return second ? `${first}\u200c${second}` : first;
+  }
+  return `${first}${second}`.toUpperCase();
+}
 
 function SunIcon() {
   return (
@@ -103,8 +126,30 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   // کنترل باز/بسته بودن سایدبار در حالت موبایل (Drawer)
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // پروفایل کسب‌وکار (مقدار اولیه null برای جلوگیری از Hydration Error)
+  const [profile, setProfile] = useState<BusinessProfile | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("nimble_profile");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          setProfile(parsed as BusinessProfile);
+        }
+      }
+    } catch {
+      // داده خراب در localStorage؛ از مقادیر پیش‌فرض استفاده می‌شود
+    }
+  }, []);
+
   // جهت صحیح انیمیشن ورود سایدبار بر اساس RTL/LTR
   const closedTransform = dir === "rtl" ? "translate-x-full" : "-translate-x-full";
+
+  // اطلاعات نمایشی مدیر در نوار بالا
+  const displayManager = profile?.managerName?.trim() || t.ownerName;
+  const displayRole = profile?.businessName?.trim() || t.ownerRole;
+  const initials = getInitials(displayManager);
 
   return (
     <div
@@ -262,12 +307,12 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3 ps-2 border-s border-white/10 light:border-slate-200">
               <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-700 p-0.5 shrink-0">
                 <div className="w-full h-full rounded-full bg-neutral-950 light:bg-white flex items-center justify-center font-bold text-xs text-emerald-400">
-                  AT
+                  {initials}
                 </div>
               </div>
-              <div className="hidden sm:block">
-                <h4 className="text-xs font-semibold text-white light:text-slate-900 leading-tight">{t.ownerName}</h4>
-                <p className="text-[10px] text-gray-400 light:text-slate-500">{t.ownerRole}</p>
+              <div className="hidden sm:block min-w-0 max-w-[160px]">
+                <h4 className="text-xs font-semibold text-white light:text-slate-900 leading-tight truncate">{displayManager}</h4>
+                <p className="text-[10px] text-gray-400 light:text-slate-500 truncate">{displayRole}</p>
               </div>
             </div>
           </div>

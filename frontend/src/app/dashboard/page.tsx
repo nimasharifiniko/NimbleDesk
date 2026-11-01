@@ -5,10 +5,18 @@ import { useDashboardLang } from "@/contexts/DashboardLangContext";
 
 type Lang = "fa" | "en";
 
+interface BusinessProfile {
+  managerName?: string;
+  businessName?: string;
+  phone?: string;
+  address?: string;
+}
+
 const TRANSLATIONS = {
   en: {
     dir: "ltr" as const,
-    welcome: "Welcome back, Alex 👋",
+    welcomePrefix: "Welcome back,",
+    welcomeNoName: "Welcome back 👋",
     subtitle: "Here's what's happening with your AI Front Desk today.",
     metrics: [
       { title: "Total Conversations", value: "1,248", change: "↗ 18.5% vs last week", icon: "💬" },
@@ -19,6 +27,7 @@ const TRANSLATIONS = {
     qrTitle: "QR Code Generator",
     qrSubtitle: "Generate a QR code for your AI Front Desk",
     copyBtn: "Copy",
+    copiedBtn: "Copied ✓",
     downloadBtn: "↓ Download QR Code",
     previewChat: "💬 Preview Customer Chat",
     uploadTitle: "Upload Documents",
@@ -48,7 +57,8 @@ const TRANSLATIONS = {
   },
   fa: {
     dir: "rtl" as const,
-    welcome: "خوش برگشتید، الکس 👋",
+    welcomePrefix: "خوش برگشتید،",
+    welcomeNoName: "خوش برگشتید 👋",
     subtitle: "اتفاقات امروز دستیار هوشمند شما اینجاست.",
     metrics: [
       { title: "کل مکالمات", value: "۱,۲۴۸", change: "↗ ۱۸.۵٪ نسبت به هفته قبل", icon: "💬" },
@@ -59,6 +69,7 @@ const TRANSLATIONS = {
     qrTitle: "تولید کد QR",
     qrSubtitle: "یک کد QR برای دستیار هوشمند خود بسازید",
     copyBtn: "کپی",
+    copiedBtn: "کپی شد ✓",
     downloadBtn: "↓ دانلود کد QR",
     previewChat: "💬 پیش‌نمایش چت مشتری",
     uploadTitle: "آپلود اسناد",
@@ -88,12 +99,10 @@ const TRANSLATIONS = {
   },
 };
 
-// آدرس نمونه چت مشتری که QR به آن اشاره می‌کند
-const QR_TARGET_URL = "https://nimble-desk.vercel.app/c/sample-cafe";
-// QR Code واقعی از QRServer API — رنگ‌ها هماهنگ با پالت پروژه (emerald روی پس‌زمینه رسمی #080c09)
-const QR_IMAGE_URL = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-  QR_TARGET_URL
-)}&color=10b981&bgcolor=080c09`;
+// دامنه اصلی پروژه — QR به چت مشتری روی همین دامنه اشاره می‌کند
+const SITE_BASE_URL = "https://nimble-desk.vercel.app";
+// اگر Onboarding انجام نشده باشد از این slug نمونه استفاده می‌شود
+const FALLBACK_SLUG = "sample-cafe";
 
 export default function BusinessDashboardOverview() {
   const { lang, setLang } = useDashboardLang();
@@ -102,6 +111,45 @@ export default function BusinessDashboardOverview() {
   // تاریخ پویا — محاسبه فقط سمت کلاینت داخل useEffect
   // (برای رفع خطای Next.js: "new Date() unstable value during prerender")
   const [dateRangeText, setDateRangeText] = useState<string>("");
+
+  // پروفایل کسب‌وکار (مقدار اولیه null برای جلوگیری از Hydration Error)
+  const [profile, setProfile] = useState<BusinessProfile | null>(null);
+
+  // slug چت مشتری (null = هنوز از localStorage خوانده نشده)
+  const [slug, setSlug] = useState<string | null>(null);
+
+  // وضعیت دکمه کپی
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    // پروفایل
+    try {
+      const raw = localStorage.getItem("nimble_profile");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          setProfile(parsed as BusinessProfile);
+        }
+      }
+    } catch {
+      // داده خراب در localStorage؛ از متن پیش‌فرض استفاده می‌شود
+    }
+
+    // slug ذخیره‌شده در Onboarding
+    let savedSlug = "";
+    try {
+      const rawBiz = localStorage.getItem("nimble_business");
+      if (rawBiz) {
+        const parsedBiz = JSON.parse(rawBiz);
+        if (parsedBiz && typeof parsedBiz.slug === "string") {
+          savedSlug = parsedBiz.slug.trim();
+        }
+      }
+    } catch {
+      // داده خراب؛ از slug نمونه استفاده می‌شود
+    }
+    setSlug(savedSlug || FALLBACK_SLUG);
+  }, []);
 
   useEffect(() => {
     const today = new Date();
@@ -123,6 +171,34 @@ export default function BusinessDashboardOverview() {
     );
   }, [lang]);
 
+  // آدرس‌های وابسته به slug (تا زمانی که slug خوانده نشده، null هستند)
+  const ready = slug !== null;
+  const chatPath = ready ? `/c/${encodeURIComponent(slug)}` : null;
+  const qrTargetUrl = chatPath ? `${SITE_BASE_URL}${chatPath}` : null;
+  const qrImageUrl = qrTargetUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+      qrTargetUrl
+    )}&color=10b981&bgcolor=080c09`
+    : null;
+
+  // کپی لینک چت (داخل event handler)
+  const handleCopy = async () => {
+    if (!qrTargetUrl) return;
+    try {
+      await navigator.clipboard.writeText(qrTargetUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // مرورگر اجازه دسترسی به کلیپ‌بورد نداد
+    }
+  };
+
+  // تیتر خوش‌آمدگویی داینامیک
+  const managerName = profile?.managerName?.trim();
+  const welcomeText = managerName
+    ? `${t.welcomePrefix} ${managerName} 👋`
+    : t.welcomeNoName;
+
   const weekDaysOpen: (keyof typeof t.days)[] = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const weekDaysClosed: (keyof typeof t.days)[] = ["Saturday", "Sunday"];
 
@@ -130,9 +206,9 @@ export default function BusinessDashboardOverview() {
     <div dir={t.dir} className="space-y-5 md:space-y-6">
       {/* Top Banner & Date Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-lg sm:text-xl font-bold text-white light:text-slate-900 flex items-center gap-2">
-            {t.welcome}
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold text-white light:text-slate-900 flex items-center gap-2 break-words">
+            {welcomeText}
           </h1>
           <p className="text-xs text-gray-400 light:text-slate-600 mt-0.5">{t.subtitle}</p>
         </div>
@@ -192,34 +268,54 @@ export default function BusinessDashboardOverview() {
           <div className="w-full flex flex-col items-center justify-center p-4 bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm rounded-xl border border-white/10 light:border-slate-200 relative">
             {/* فریم شیشه‌ای + گلو سبز نئونی دور QR واقعی — وسط‌چین و کاملاً قابل اسکن در موبایل */}
             <div className="w-40 h-40 sm:w-44 sm:h-44 rounded-2xl overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.25)] border border-emerald-500/20 bg-neutral-950 mx-auto">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={QR_IMAGE_URL}
-                alt="QR Code - NimbleDesk AI Front Desk"
-                width={160}
-                height={160}
-                className="w-[92%] h-[92%] object-contain rounded-lg"
-              />
+              {qrImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={qrImageUrl}
+                  alt="QR Code - NimbleDesk AI Front Desk"
+                  width={160}
+                  height={160}
+                  className="w-[92%] h-[92%] object-contain rounded-lg"
+                />
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="w-[92%] h-[92%] rounded-lg bg-white/10 animate-pulse"
+                />
+              )}
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between bg-neutral-950/40 light:bg-neutral-100 backdrop-blur-sm border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-300 light:text-slate-600">
-              <span className="truncate text-[11px] text-gray-400 light:text-slate-500">{QR_TARGET_URL}</span>
-              <button type="button" className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold shrink-0 ms-2">{t.copyBtn}</button>
+              <span dir="ltr" className="truncate text-[11px] text-gray-400 light:text-slate-500">
+                {qrTargetUrl ?? "…"}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopy}
+                disabled={!ready}
+                className="text-emerald-400 hover:text-emerald-300 text-xs font-semibold shrink-0 ms-2 disabled:opacity-50"
+              >
+                {copied ? t.copiedBtn : t.copyBtn}
+              </button>
             </div>
             <a
-              href={QR_IMAGE_URL}
+              href={qrImageUrl ?? "#"}
               download="nimbledesk-qr-code.png"
-              className="w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:brightness-110 transition"
+              aria-disabled={!ready}
+              className={`w-full flex items-center justify-center py-2.5 bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(57,255,20,0.3)] hover:brightness-110 transition ${ready ? "" : "pointer-events-none opacity-60"
+                }`}
             >
               {t.downloadBtn}
             </a>
             <a
-              href="/c/sample-cafe"
+              href={chatPath ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-gray-300 light:text-slate-600 hover:text-emerald-400 font-semibold text-xs rounded-xl backdrop-blur-xl transition"
+              aria-disabled={!ready}
+              className={`w-full flex items-center justify-center gap-1.5 py-2.5 bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 hover:border-emerald-500/40 text-gray-300 light:text-slate-600 hover:text-emerald-400 font-semibold text-xs rounded-xl backdrop-blur-xl transition ${ready ? "" : "pointer-events-none opacity-60"
+                }`}
             >
               {t.previewChat}
             </a>

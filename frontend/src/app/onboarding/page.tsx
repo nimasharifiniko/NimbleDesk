@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 type Lang = "fa" | "en";
 
-// فرمت جدید برای امکانات قیمت‌گذاری
 type ServiceItem = {
   id: string;
   name: string;
@@ -126,6 +124,8 @@ const TRANSLATIONS = {
     step1Subtitle: "We will pre-configure AI tools, service menus, and FAQ templates for your trade.",
     step2Title: "Business Information",
     step2Subtitle: "Enter your basic details so customers and AI front desk know who you are.",
+    managerNameLabel: "Manager Name *",
+    managerNamePlaceholder: "e.g. Alex Thompson",
     businessNameLabel: "Business Name *",
     businessNamePlaceholder: "e.g. Glow Beauty Salon",
     slugLabel: "Custom URL Slug *",
@@ -153,6 +153,8 @@ const TRANSLATIONS = {
     step1Subtitle: "ابزارهای هوش مصنوعی، منوی خدمات و قالب‌های سؤالات متداول متناسب با کسب‌وکار شما تنظیم می‌شود.",
     step2Title: "اطلاعات کسب‌وکار",
     step2Subtitle: "جزئیات اولیه را وارد کنید تا مشتریان و دستیار هوشمند شما را بشناسند.",
+    managerNameLabel: "نام مدیر *",
+    managerNamePlaceholder: "مثلاً: علی رضایی",
     businessNameLabel: "نام کسب‌وکار *",
     businessNamePlaceholder: "مثلاً: سالن زیبایی گلو",
     slugLabel: "آدرس اختصاصی *",
@@ -198,7 +200,6 @@ const CheckIcon = () => (
 );
 
 export default function OnboardingWizardPage() {
-  const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [lang, setLang] = useState<Lang>("en");
   const [step, setStep] = useState(1);
@@ -206,17 +207,20 @@ export default function OnboardingWizardPage() {
   const [selectedIndustryId, setSelectedIndustryId] = useState<string>(INDUSTRIES_BY_LANG.en[0].id);
 
   const [formData, setFormData] = useState({
+    managerName: "",
     businessName: "",
     slug: "",
     phone: "",
     address: "",
   });
 
-  // وضعیت خدمات مرحله ۳
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [newService, setNewService] = useState({ name: "", price: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: "", price: "" });
+
+  const servicesDirtyRef = useRef(false);
+  const prevIndustryRef = useRef<string | null>(null);
 
   const t = TRANSLATIONS[lang];
   const industries = INDUSTRIES_BY_LANG[lang];
@@ -227,8 +231,12 @@ export default function OnboardingWizardPage() {
     [industries, selectedIndustryId]
   );
 
-  // لود کردن خدمات پیش‌فرض وقتی صنعت یا زبان عوض می‌شود
   useEffect(() => {
+    const industryChanged = prevIndustryRef.current !== selectedIndustryId;
+    prevIndustryRef.current = selectedIndustryId;
+
+    if (servicesDirtyRef.current && !industryChanged) return;
+
     const defaultSvc: ServiceItem[] = selectedIndustry.defaultServices.map((s, i) => ({
       id: `default-${i}`,
       name: s.name,
@@ -236,22 +244,22 @@ export default function OnboardingWizardPage() {
       active: true,
     }));
     setServices(defaultSvc);
-  }, [selectedIndustry, lang]);
+    servicesDirtyRef.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndustryId, lang]);
 
-  // تابع تبدیل ارز
   const formatPrice = (priceVal: string) => {
-    if (!priceVal) return t.freeText;
+    if (!priceVal || !priceVal.trim()) return t.freeText;
     const num = Number(priceVal.replace(/,/g, ""));
-    if (isNaN(num)) return priceVal; // اگر متن خام وارد کرد (مثلا "توافقی")
+    if (isNaN(num)) return priceVal;
     if (num === 0) return t.freeText;
     if (lang === "fa") return `${num.toLocaleString("fa-IR")} تومان`;
     return `$${num.toLocaleString("en-US")}`;
   };
 
   const handleToggleService = (id: string) => {
-    setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
-    );
+    servicesDirtyRef.current = true;
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s)));
   };
 
   const handleStartEdit = (svc: ServiceItem) => {
@@ -260,6 +268,7 @@ export default function OnboardingWizardPage() {
   };
 
   const handleSaveEdit = (id: string) => {
+    servicesDirtyRef.current = true;
     setServices((prev) =>
       prev.map((s) => (s.id === id ? { ...s, name: editForm.name, price: editForm.price } : s))
     );
@@ -268,45 +277,59 @@ export default function OnboardingWizardPage() {
 
   const handleAddService = () => {
     if (!newService.name.trim()) return;
+    servicesDirtyRef.current = true;
     const newId = `custom-${Date.now()}`;
-    setServices([...services, { id: newId, name: newService.name, price: newService.price, active: true }]);
+    setServices((prev) => [
+      ...prev,
+      { id: newId, name: newService.name.trim(), price: newService.price, active: true },
+    ]);
     setNewService({ name: "", price: "" });
   };
 
+  const step2Invalid =
+    !formData.managerName.trim() || !formData.businessName.trim() || !formData.slug.trim();
+
   const handleNext = () => {
-    if (step === 2 && (!formData.businessName || !formData.slug)) return;
+    if (step === 2 && step2Invalid) return;
 
     if (step < 3) {
       setStep((prev) => prev + 1);
-    } else {
-      // ذخیره خدمات فعال و فرمت شده در localStorage برای API Chat
-      if (typeof window !== "undefined") {
-        const activeServicesFormatted = services
-          .filter((s) => s.active)
-          .map((s) => ({
-            name: s.name,
-            price: formatPrice(s.price),
-            active: s.active
-          }));
-
-        localStorage.setItem("nimble_services", JSON.stringify(activeServicesFormatted));
-
-        // ذخیره اطلاعات کسب‌وکار
-        localStorage.setItem(
-          "nimble_business",
-          JSON.stringify({
-            industry: selectedIndustry.id,
-            businessName: formData.businessName,
-            slug: formData.slug,
-            phone: formData.phone,
-            address: formData.address,
-          })
-        );
-      }
-
-      // هدایت به داشبورد با Full Reload
-      window.location.href = "/dashboard";
+      return;
     }
+
+    if (typeof window !== "undefined") {
+      const activeServicesFormatted = services
+        .filter((s) => s.active)
+        .map((s) => ({
+          name: s.name,
+          price: formatPrice(s.price),
+          active: true,
+        }));
+      localStorage.setItem("nimble_services", JSON.stringify(activeServicesFormatted));
+
+      localStorage.setItem(
+        "nimble_profile",
+        JSON.stringify({
+          managerName: formData.managerName.trim(),
+          businessName: formData.businessName.trim(),
+          phone: formData.phone.trim(),
+          address: formData.address.trim(),
+        })
+      );
+
+      localStorage.setItem(
+        "nimble_business",
+        JSON.stringify({
+          industry: selectedIndustry.id,
+          businessName: formData.businessName.trim(),
+          slug: formData.slug.trim(),
+          phone: formData.phone.trim(),
+          address: formData.address.trim(),
+        })
+      );
+    }
+
+    window.location.href = "/dashboard";
   };
 
   return (
@@ -329,7 +352,6 @@ export default function OnboardingWizardPage() {
               {t.stepOf(step)}
             </span>
 
-            {/* Language */}
             <button
               type="button"
               onClick={() => setLang(lang === "en" ? "fa" : "en")}
@@ -338,7 +360,6 @@ export default function OnboardingWizardPage() {
               🌐 {lang === "en" ? "FA" : "EN"}
             </button>
 
-            {/* Theme */}
             <button
               type="button"
               onClick={toggleTheme}
@@ -390,6 +411,18 @@ export default function OnboardingWizardPage() {
 
             <div className="space-y-3 text-xs">
               <div className="space-y-1">
+                <label className="text-gray-300 light:text-slate-700 font-medium">{t.managerNameLabel}</label>
+                <input
+                  type="text"
+                  required
+                  placeholder={t.managerNamePlaceholder}
+                  value={formData.managerName}
+                  onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}
+                  className="w-full bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white light:text-slate-900 outline-none focus:border-emerald-500/60 transition"
+                />
+              </div>
+
+              <div className="space-y-1">
                 <label className="text-gray-300 light:text-slate-700 font-medium">{t.businessNameLabel}</label>
                 <input
                   type="text"
@@ -398,8 +431,8 @@ export default function OnboardingWizardPage() {
                   value={formData.businessName}
                   onChange={(e) => {
                     const name = e.target.value;
-                    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-                    setFormData({ ...formData, businessName: name, slug });
+                    const generated = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                    setFormData({ ...formData, businessName: name, slug: generated || formData.slug });
                   }}
                   className="w-full bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-white light:text-slate-900 outline-none focus:border-emerald-500/60 transition"
                 />
@@ -407,8 +440,8 @@ export default function OnboardingWizardPage() {
 
               <div className="space-y-1">
                 <label className="text-gray-300 light:text-slate-700 font-medium">{t.slugLabel}</label>
-                <div className="flex items-center bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-gray-400 light:text-slate-500 focus-within:border-emerald-500/60 transition">
-                  <span className="text-[11px] text-gray-500 light:text-slate-400">nimbledesk.com/c/</span>
+                <div className="flex items-center bg-white/5 light:bg-white border border-white/10 light:border-slate-200 backdrop-blur-xl rounded-xl px-3.5 py-2.5 text-gray-400 light:text-slate-500 focus-within:border-emerald-500/60 transition" dir="ltr">
+                  <span className="text-[11px] text-gray-500 light:text-slate-400 whitespace-nowrap">nimbledesk.com/c/</span>
                   <input
                     type="text"
                     required
@@ -455,7 +488,7 @@ export default function OnboardingWizardPage() {
               <p className="text-xs text-gray-400 light:text-slate-600 mt-1">{t.step3Subtitle}</p>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1 [scrollbar-width:thin] light:[color-scheme:light]">
+            <div className="flex-1 overflow-y-auto space-y-2 pe-1 [scrollbar-width:thin] light:[color-scheme:light]">
               {services.map((svc) => (
                 <div key={svc.id} className="p-3 rounded-xl bg-white/5 light:bg-white/80 border border-white/10 light:border-slate-200 backdrop-blur-xl transition hover:border-white/20 light:hover:border-slate-300">
                   {editingId === svc.id ? (
@@ -464,7 +497,7 @@ export default function OnboardingWizardPage() {
                         type="text"
                         value={editForm.name}
                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="flex-1 bg-neutral-950/30 light:bg-slate-50 border border-white/10 light:border-slate-200 rounded-lg px-2 py-1.5 text-xs text-white light:text-slate-900 outline-none focus:border-emerald-500/50"
+                        className="flex-1 min-w-0 bg-neutral-950/30 light:bg-slate-50 border border-white/10 light:border-slate-200 rounded-lg px-2 py-1.5 text-xs text-white light:text-slate-900 outline-none focus:border-emerald-500/50"
                       />
                       <input
                         type="text"
@@ -474,21 +507,23 @@ export default function OnboardingWizardPage() {
                         className="w-20 bg-neutral-950/30 light:bg-slate-50 border border-white/10 light:border-slate-200 rounded-lg px-2 py-1.5 text-xs text-white light:text-slate-900 outline-none focus:border-emerald-500/50"
                       />
                       <button
+                        type="button"
                         onClick={() => handleSaveEdit(svc.id)}
-                        className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition"
+                        className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition shrink-0"
                       >
                         <CheckIcon />
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col opacity-100 transition-opacity" style={{ opacity: svc.active ? 1 : 0.4 }}>
-                        <span className="text-sm font-medium text-white light:text-slate-900">{svc.name}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col min-w-0 transition-opacity" style={{ opacity: svc.active ? 1 : 0.4 }}>
+                        <span className="text-sm font-medium text-white light:text-slate-900 truncate">{svc.name}</span>
                         <span className="text-xs text-emerald-400 font-semibold">{formatPrice(svc.price)}</span>
                       </div>
 
                       <div className="flex items-center gap-3 shrink-0">
                         <button
+                          type="button"
                           onClick={() => handleStartEdit(svc)}
                           className="text-gray-400 light:text-slate-400 hover:text-emerald-400 light:hover:text-emerald-500 transition"
                         >
@@ -497,6 +532,7 @@ export default function OnboardingWizardPage() {
 
                         {/* Glassmorphism Toggle */}
                         <button
+                          type="button"
                           onClick={() => handleToggleService(svc.id)}
                           className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-white/10 transition-colors duration-200 ease-in-out backdrop-blur-md ${svc.active ? "bg-emerald-500/60 border-emerald-400" : "bg-white/10 light:bg-slate-300"
                             }`}
@@ -504,7 +540,9 @@ export default function OnboardingWizardPage() {
                           <span
                             className="pointer-events-none inline-block h-3.5 w-3.5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
                             style={{
-                              transform: svc.active ? (isRtl ? "translateX(-16px)" : "translateX(16px)") : "translateX(2px)"
+                              transform: svc.active
+                                ? isRtl ? "translateX(-16px)" : "translateX(16px)"
+                                : isRtl ? "translateX(-2px)" : "translateX(2px)",
                             }}
                           />
                         </button>
@@ -524,7 +562,7 @@ export default function OnboardingWizardPage() {
                   placeholder={t.serviceNameLabel}
                   value={newService.name}
                   onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-                  className="flex-1 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-white light:text-slate-900 outline-none focus:border-emerald-500/50 backdrop-blur-md"
+                  className="flex-1 min-w-0 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-white light:text-slate-900 outline-none focus:border-emerald-500/50 backdrop-blur-md"
                 />
                 <input
                   type="text"
@@ -535,6 +573,7 @@ export default function OnboardingWizardPage() {
                   className="w-20 sm:w-24 bg-white/5 light:bg-white border border-white/10 light:border-slate-200 rounded-xl px-3 py-2 text-xs text-white light:text-slate-900 outline-none focus:border-emerald-500/50 backdrop-blur-md text-center"
                 />
                 <button
+                  type="button"
                   onClick={handleAddService}
                   disabled={!newService.name.trim()}
                   className="px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold hover:bg-emerald-500/20 disabled:opacity-30 transition shrink-0 whitespace-nowrap"
@@ -563,7 +602,7 @@ export default function OnboardingWizardPage() {
           <button
             type="button"
             onClick={handleNext}
-            disabled={step === 2 && (!formData.businessName || !formData.slug)}
+            disabled={step === 2 && step2Invalid}
             className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-green-500 text-black font-bold text-xs shadow-[0_0_20px_rgba(57,255,20,0.35)] hover:brightness-110 active:scale-95 transition disabled:opacity-40"
           >
             {step === 3 ? t.launch : t.continue}

@@ -13,6 +13,13 @@ interface Message {
   timestamp: string;
 }
 
+interface BusinessProfile {
+  managerName?: string;
+  businessName?: string;
+  phone?: string;
+  address?: string;
+}
+
 /* ---------- آیکون‌های SVG داخلی ---------- */
 const GlobeIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,6 +162,9 @@ function CustomerChatContent() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // پروفایل کسب‌وکار (فقط بعد از mount از localStorage خوانده می‌شود → بدون Hydration Error)
+  const [profile, setProfile] = useState<BusinessProfile | null>(null);
+
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingForm, setBookingForm] = useState({ name: "", phone: "", date: "" });
@@ -163,8 +173,26 @@ function CustomerChatContent() {
   const t = TRANSLATIONS[lang];
   const isRtl = t.dir === "rtl";
 
+  // نام نمایشی هدر: نام کسب‌وکار از پروفایل؛ در غیر این صورت از slug
+  const displayName = profile?.businessName?.trim() || slug.replace(/-/g, " ");
+
   const nowTime = () =>
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+  // خواندن پروفایل از localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("nimble_profile");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          setProfile(parsed as BusinessProfile);
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read nimble_profile from localStorage", e);
+    }
+  }, []);
 
   useEffect(() => {
     setMessages([
@@ -175,6 +203,7 @@ function CustomerChatContent() {
         timestamp: nowTime(),
       },
     ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
   useEffect(() => {
@@ -210,7 +239,7 @@ function CustomerChatContent() {
     setLoading(true);
 
     try {
-      // خواندن خدمات تنظیم‌شده توسط صاحب کسب‌وکار از localStorage
+      // خواندن خدمات تنظیم‌شده توسط صاحب کسب‌وکار (داخل event handler، امن برای Hydration)
       let customServices = null;
       try {
         const stored = localStorage.getItem("nimble_services");
@@ -221,11 +250,14 @@ function CustomerChatContent() {
         console.warn("Could not read nimble_services from localStorage", e);
       }
 
-      // ارسال درخواست به سرور به همراه customServices
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: apiMessages, customServices }),
+        body: JSON.stringify({
+          messages: apiMessages,
+          customServices,
+          businessProfile: profile,
+        }),
       });
 
       const data = await res.json();
@@ -242,7 +274,6 @@ function CustomerChatContent() {
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err: any) {
-      // نمایش خطای شفاف به کاربر در صورت خرابی
       const errorMsg = err.message || "متاسفانه ارتباط با هوش مصنوعی برقرار نشد.";
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -298,7 +329,7 @@ function CustomerChatContent() {
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="font-bold text-white light:text-slate-900 text-sm sm:text-base capitalize truncate">
-                {slug.replace(/-/g, " ")}
+                {displayName}
               </h1>
               <p className="text-[10px] sm:text-xs text-green-400 flex items-center gap-1 truncate">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)] shrink-0"></span>
