@@ -22,7 +22,7 @@ const TRANSLATIONS = {
     features: [
       {
         icon: "💬",
-        title: "24/7 Instant Responses",
+        title: <><span dir="ltr" className="inline-block mx-1 font-sans">24/7</span> Instant Responses</>,
         desc: "Your AI assistant answers customer questions instantly, day or night, no breaks needed.",
       },
       {
@@ -49,7 +49,7 @@ const TRANSLATIONS = {
     dir: "rtl" as const,
     brand: "نیمبل‌دسک",
     loginBtn: "ورود",
-    heroTitleLine1: "دستیار هوشمند ۲۴/۷",
+    heroTitleLine1: <>دستیار هوشمند <span dir="ltr" className="inline-block mx-1 font-sans">24/7</span></>,
     heroTitleHighlight: "کسب‌وکار شما",
     heroSubtitle:
       "به مشتریان خود یک دستیار هوشمند همیشه‌فعال بدهید که به سؤالات پاسخ می‌دهد، نوبت رزرو می‌کند و هرگز نمی‌خوابد.",
@@ -60,7 +60,7 @@ const TRANSLATIONS = {
     features: [
       {
         icon: "💬",
-        title: "پاسخگویی ۲۴/۷",
+        title: <>پاسخگویی <span dir="ltr" className="inline-block mx-1 font-sans">24/7</span></>,
         desc: "دستیار هوشمند شما شب و روز، بدون وقفه، به سؤالات مشتریان پاسخ فوری می‌دهد.",
       },
       {
@@ -172,9 +172,9 @@ export default function LandingPage() {
         <div className="w-full mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/signup"
-            className="w-full sm:w-auto flex items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-7 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)] text-center"
+            className="w-full sm:w-auto flex items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-7 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)] text-center gap-2"
           >
-            {t.ctaPrimary} →
+            {t.ctaPrimary} {lang === "fa" ? "←" : "→"}
           </Link>
 
           <a
@@ -199,13 +199,13 @@ export default function LandingPage() {
           {t.features.map((f, idx) => (
             <div
               key={idx}
-              className="w-full rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
+              className="w-full h-full flex flex-col rounded-2xl border border-white/10 light:border-slate-200 bg-white/5 light:bg-white/80 light:shadow-md p-5 backdrop-blur-xl transition hover:border-emerald-500/30"
             >
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl mb-4 shrink-0">
                 {f.icon}
               </div>
               <h3 className="text-sm font-bold text-white light:text-slate-900">{f.title}</h3>
-              <p className="mt-1.5 text-xs text-gray-400 light:text-slate-600 leading-relaxed">{f.desc}</p>
+              <p className="mt-1.5 text-xs text-gray-400 light:text-slate-600 leading-relaxed flex-1">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -219,9 +219,9 @@ export default function LandingPage() {
 
           <Link
             href="/signup"
-            className="w-full sm:w-auto mt-8 flex sm:inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)]"
+            className="w-full sm:w-auto mt-8 flex sm:inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-400 to-green-500 px-8 py-3.5 text-sm font-bold text-black shadow-[0_0_25px_rgba(74,222,128,0.4)] transition hover:brightness-110 hover:shadow-[0_0_30px_rgba(74,222,128,0.55)]"
           >
-            {t.ctaPrimary} →
+            {t.ctaPrimary} {lang === "fa" ? "←" : "→"}
           </Link>
         </div>
       </section>
