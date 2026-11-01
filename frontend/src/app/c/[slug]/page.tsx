@@ -101,9 +101,6 @@ const TRANSLATIONS = {
     submitBooking: "ثبت درخواست",
     cancelBtn: "انصراف",
     bookingSuccess: "درخواست رزرو شما با موفقیت ثبت شد! به‌زودی با شما تماس می‌گیریم.",
-    hoursReply: "ساعات کاری ما شنبه تا پنجشنبه، از ساعت ۰۹:۰۰ الی ۲۲:۰۰ می‌باشد.",
-    servicesReply: "خدمات ما شامل منوی اسپرسوبار، دسرها و رزرو سالن خصوصی است.",
-    thanksReply: "ممنون از پیام شما! چطور می‌توانم بیشتر کمکتان کنم؟",
     footerCopyright: "© ۲۰۲۶ تمام حقوق برای NimbleDesk محفوظ است · طراحی و توسعه توسط نیما شریفی‌نیکو",
   },
   en: {
@@ -124,9 +121,6 @@ const TRANSLATIONS = {
     submitBooking: "Confirm Booking",
     cancelBtn: "Cancel",
     bookingSuccess: "Your booking request has been submitted successfully! We'll contact you soon.",
-    hoursReply: "Our operating hours are Monday to Saturday, 09:00 AM to 10:00 PM.",
-    servicesReply: "Our services include espresso bar menu, desserts, and private hall bookings.",
-    thanksReply: "Thank you for reaching out! How else can I assist you?",
     footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
   nl: {
@@ -147,14 +141,9 @@ const TRANSLATIONS = {
     submitBooking: "Afspraak Bevestigen",
     cancelBtn: "Annuleren",
     bookingSuccess: "Uw afspraakaanvraag is succesvol verzonden! We nemen spoedig contact op.",
-    hoursReply: "Wij zijn open van maandag t/m zaterdag van 09:00 tot 22:00.",
-    servicesReply: "Onze diensten omvatten espressobar, desserts en zaalreserveringen.",
-    thanksReply: "Bedankt voor uw bericht! Hoe kan ik u verder helpen?",
     footerCopyright: "© 2026 NimbleDesk · Designed & Developed by Nima Sharifi Niko",
   },
 };
-
-type Intent = "services" | "hours" | "booking" | "general";
 
 function CustomerChatContent() {
   const params = useParams();
@@ -198,7 +187,7 @@ function CustomerChatContent() {
     { code: "nl", label: "NL" },
   ];
 
-  const sendMessage = async (overrideText?: string, intent: Intent = "general") => {
+  const sendMessage = async (overrideText?: string) => {
     const textToSend = overrideText || input;
     if (!textToSend.trim() || loading) return;
 
@@ -209,7 +198,7 @@ function CustomerChatContent() {
       timestamp: nowTime(),
     };
 
-    // آماده‌سازی تاریخچه پیام‌ها برای ارسال به API هوش مصنوعی (نقش کاربر و دستیار)
+    // آماده‌سازی تاریخچه مکالمات برای هوش مصنوعی
     const apiMessages = messages.map((m) => ({
       role: m.sender === "user" ? "user" : "assistant",
       content: m.text,
@@ -221,35 +210,33 @@ function CustomerChatContent() {
     setLoading(true);
 
     try {
-      // ارسال درخواست به Route Handler داخلی (Next.js)
+      // ارسال درخواست به سرور خودمان که به OpenRouter وصل است
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: apiMessages,
-        }),
+        body: JSON.stringify({ messages: apiMessages }),
       });
 
-      if (!res.ok) throw new Error("Failed to fetch from API");
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "خطای نامشخص در ارتباط با سرور");
+      }
+
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: data.response || t.thanksReply,
+        text: data.response,
         timestamp: nowTime(),
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch {
-      // Fallback: اگر API خطا داد (مثلاً اینترنت قطع بود یا کلید تنظیم نبود)
-      let reply = t.thanksReply;
-      if (intent === "hours") reply = t.hoursReply;
-      else if (intent === "services") reply = t.servicesReply;
-
+    } catch (err: any) {
+      // نمایش خطای شفاف به کاربر در صورت خرابی
+      const errorMsg = err.message || "متاسفانه ارتباط با هوش مصنوعی برقرار نشد.";
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
         sender: "bot",
-        text: reply,
+        text: `⚠️ خطا: ${errorMsg}`,
         timestamp: nowTime(),
       };
       setMessages((prev) => [...prev, botMsg]);
@@ -366,7 +353,7 @@ function CustomerChatContent() {
                     <div className="mt-3 pt-3 border-t border-white/10 light:border-slate-200 flex flex-col gap-2">
                       <button
                         type="button"
-                        onClick={() => sendMessage(t.viewServices, "services")}
+                        onClick={() => sendMessage(t.viewServices)}
                         className="w-full text-start px-3 py-2 rounded-xl bg-white/5 light:bg-slate-50 hover:bg-white/10 light:hover:bg-slate-100 border border-white/10 light:border-slate-200 text-xs text-green-300 light:text-green-600 flex items-center justify-between transition"
                       >
                         <span>{t.viewServices}</span>
@@ -374,7 +361,7 @@ function CustomerChatContent() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => sendMessage(t.workingHours, "hours")}
+                        onClick={() => sendMessage(t.workingHours)}
                         className="w-full text-start px-3 py-2 rounded-xl bg-white/5 light:bg-slate-50 hover:bg-white/10 light:hover:bg-slate-100 border border-white/10 light:border-slate-200 text-xs text-green-300 light:text-green-600 flex items-center justify-between transition"
                       >
                         <span>{t.workingHours}</span>
@@ -428,14 +415,14 @@ function CustomerChatContent() {
           </button>
           <button
             type="button"
-            onClick={() => sendMessage(t.workingHours, "hours")}
+            onClick={() => sendMessage(t.workingHours)}
             className="flex-none px-3 py-1.5 rounded-full bg-white/5 light:bg-white hover:bg-white/10 light:hover:bg-slate-100 border border-white/10 light:border-slate-200 text-green-300 light:text-green-600 text-xs font-medium transition whitespace-nowrap backdrop-blur-xl"
           >
             {t.hoursBtn}
           </button>
           <button
             type="button"
-            onClick={() => sendMessage(t.viewServices, "services")}
+            onClick={() => sendMessage(t.viewServices)}
             className="flex-none px-3 py-1.5 rounded-full bg-white/5 light:bg-white hover:bg-white/10 light:hover:bg-slate-100 border border-white/10 light:border-slate-200 text-green-300 light:text-green-600 text-xs font-medium transition whitespace-nowrap backdrop-blur-xl"
           >
             {t.servicesBtn}
