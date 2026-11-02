@@ -88,9 +88,9 @@ Open http://localhost:3000 in your browser.
 Designed and engineered with precision by Nima Sharifi Niko.
 
 🌐 Live SaaS Demo: https://nimble-desk.vercel.app
-💼 LinkedIn:linkedin.com/in/nima-sharifiniko/
-🐙 GitHub: github.com/nimasharifiniko
-📧 Email: nima.sharifiniko@gmail.com
+💼 LinkedIn:https://www.linkedin.com/in/nima-sharifiniko/
+🐙 GitHub: https://github.com/nimasharifiniko
+📧 Email: nimasharify.pc1@gmail.com
 📜 License
 Distributed under the MIT License. See LICENSE for more information.
 
