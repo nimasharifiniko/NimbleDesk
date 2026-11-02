@@ -1,48 +1,96 @@
 # ⚡ NimbleDesk - AI-Powered Smart Front-Desk & Customer Engagement Platform
 
-NimbleDesk is a next-generation, multi-tenant AI support and commerce platform designed for local businesses (cafes, clinics, restaurants, and service providers). It combines a deterministic RAG engine with strict tenant isolation, zero-hallucination pricing, full RTL/Persian layout support, and a beautiful Apple-inspired glassmorphism UI.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-nimble--desk.vercel.app-10b981?style=for-the-badge&logo=vercel)](https://nimble-desk.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-16.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![PWA Ready](https://img.shields.io/badge/PWA-Installable-emerald?style=for-the-badge&logo=pwa)](https://nimble-desk.vercel.app)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+> **Designed & Developed by Nima Sharifi Niko**  
+> *A full-featured, production-ready AI SaaS platform engineered for local businesses (cafes, clinics, auto repairs, and service providers).*
 
 ---
 
-## ✨ Key Features
+## 🌟 Executive Overview
 
-- 🎯 **Zero-Hallucination RAG**: Services, prices, and operating hours are fetched directly from PostgreSQL database records, preventing LLM fabrication.
-- 📀 **Multi-Tenant Security**: Strict `business_id` filtering across all FastAPI endpoints,, vector searches, and DB transactions.
-- 🌰 **Multilingual & Full RTL**: Native support for English (`en`), Persian(`fa`), and Dutch (`nl`) with automatic RTL layout adjustments and Vazirmatn typography.
-- 💢 **PWA Customer Chat Widget**: Fast, mobile-first chat interface with automatic booking modals at `/c/[business_slug]`.
-- 👩 **Industry Onboarding Wizard**: 3-step wizard for Cafes, Clinics, and Services with auto-generated sample menus and FAQs.
-- 📩 **TXT & PDF File Ingestion**: Upload custom business documents and automatically integrate them into the vector store.
-- 🛸﮿ **QR Code Manager & Printable Posters**: Generate business QR codes and print professional announcement posters.
+**NimbleDesk** is a next-generation 24/7 AI-powered front-desk engagement platform. It empowers local SMBs to deploy an instant, multi-lingual AI assistant capable of answering business inquiries, handling service pricing, providing operational hours, and guiding customer bookings without human intervention.
 
 ---
 
-## 👏 Tech Stack
+## 🔥 Key Technical Highlights
 
-- **Frontend**: Next.js 16.4 (App Router, Turbopack, Cache Components), Tailwind CSS, Lucide React, Next-Intl
-- **Backend**: FastAPI (Asyncio), Pydantic, Alembic, Pytest (51 E2E Integration Tests)
-- **Database & Vector Store**: PostgreSQL 16 with `pgvector`
-- **AI & LLM2 Integration**: OpenAI GPT-4 / GPT-3.5-Turdo, Hybrid Retrieval, Custom Prompt Guard
+### 🧠 1. Stateless Multi-Tenant RAG via QR URL Encoding
+* **Zero-Database Multi-Tenancy for Cross-Device AI Context**: Business profiles and custom service catalogs configured during onboarding are compressed and encoded into UTF-8 Base64 parameters directly within QR Code deep-links (`/c/[slug]?biz=...`).
+* **Cross-Device Context Persistence**: Any customer scanning the QR code with their mobile device instantly inherits the complete, accurate business persona and menu pricing for the AI model without server-side database lookups or latency.
+
+### 🤖 2. Dynamic Real-Time Multi-Model LLM Engine
+* **OpenRouter API Integration**: Connected to state-of-the-art open-source and proprietary models (`Gemini 2.0 Flash`, `Llama 3.3 70B`, `Qwen 2.5`, `DeepSeek R1`) with automated failover routing.
+* **Hybrid Knowledge Context**: Capable of answering specific business query contexts (e.g., custom service pricing, manager details, operating hours) while smoothly handling open-ended general domain questions (e.g., coffee science, technical advice, general FAQs).
+
+### 🌍 3. Native Trilingual Support & Pixel-Perfect RTL System
+* **Bilingual & Trilingual Fluidity**: Native support for **Persian (`fa`)**, **English (`en`)**, and **Dutch (`nl`)**.
+* **Robust Bidi & RTL Handling**: Built-in Bidirectional text isolation for numerical strings (e.g., `24/7`, phone numbers) preventing layout breakage in Persian RTL layouts.
+* **Dynamic Currency System**: Automatic currency symbol context switching (`$` for English / `تومان` for Persian).
+
+### 📱 4. Progressive Web App (PWA) & Glassmorphism UI
+* **Installable SaaS Platform**: Fully configured `manifest.json` with high-resolution maskable glassmorphic green icons (`192x192`, `512x512`, `apple-touch-icon`).
+* **Mobile-Responsive Drawer Sidebar**: Custom responsive drawer menu with mobile backdrop blur, touch overlays, and dynamic viewport handling (`100dvh` layout preventing mobile address bar cutoffs).
 
 ---
 
-## 👉 QuickStart (Local Development)
+## 🛠️ Architecture & Tech Stack
 
-1. **Clone the repository**:
-   `bash
-   git clone https://github.com/your-username/NimbleDesk.git
-   cd NimbleDesk
-   ``
+| Layer | Technology / Tools |
+| :--- | :--- |
+| **Frontend Framework** | **Next.js 16.4** (App Router, Turbopack, Partial Prerender, Cache Components) |
+| **Language & Styling** | **TypeScript**, **Tailwind CSS**, Glassmorphism Design Token System, Vazirmatn Typography |
+| **AI & LLM Integration** | **OpenRouter API** (`Gemini Flash`, `Llama 3.3`, `Qwen 2.5`, `DeepSeek R1`) |
+| **State & Context** | React Context API (`ThemeContext`, `DashboardLangContext`), LocalStorage Persistence |
+| **PWA & Media** | Web App Manifest, Service Workers, Dynamic QR Code Server API |
+| **Deployment** | **Vercel** (Global Edge Network, Automated Continuous Deployment) |
+| **Backend Architecture** *(Repo Ingestion)* | **FastAPI (Python 3.11)**, **PostgreSQL 16** with **pgvector**, **Pydantic v2**, **Pytest** (51 E2E tests) |
 
-2. **Start with Docker Compose**:
-   `bash
-   docker compose -f docker-compose.prod.yml up -d --build
-   ``J
- 3. **Run Backend Tests**:
-   `bash
-   python -m pytest backend/tests/
-   ``J
 ---
 
-## 📀 License
+## 🚀 Live Demo Journey
 
-MIT License.
+Experience the platform live at **[nimble-desk.vercel.app](https://nimble-desk.vercel.app)**:
+
+1. **Landing Page (`/`)**: Dark/Light mode toggle, bilingual presentation, interactive demo triggers.
+2. **Onboarding Wizard (`/onboarding`)**:
+   - **Step 1**: Select trade sector (Spa, Cafe, Auto Repair, Clinic).
+   - **Step 2**: Custom business name, manager, phone, address, and URL slug.
+   - **Step 3**: Service pricing manager (toggle, edit, add custom services like *Tire Repair*).
+3. **Dashboard (`/dashboard`)**: Analytics metrics, live scannable QR Code generator, PDF document upload widget, business hours manager.
+4. **AI Customer Chat (`/c/sample-cafe`)**: Interactive customer chat widget with live AI responses.
+
+---
+
+## 💻 Local Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/nimasharifiniko/NimbleDesk.git
+cd NimbleDesk/frontend
+
+# Install dependencies
+npm install
+
+# Configure environment variables
+echo "OPENROUTER_API_KEY=your_openrouter_api_key" > .env.local
+
+# Run the development server
+npm run dev
+Open http://localhost:3000 in your browser.
+
+📬 Contact & Author
+Designed and engineered with precision by Nima Sharifi Niko.
+
+🌐 Live SaaS Demo: https://nimble-desk.vercel.app
+💼 LinkedIn:linkedin.com/in/nima-sharifiniko/
+🐙 GitHub: github.com/nimasharifiniko
+📧 Email: nima.sharifiniko@gmail.com
+📜 License
+Distributed under the MIT License. See LICENSE for more information.
+
